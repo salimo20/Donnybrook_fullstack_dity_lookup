@@ -5,28 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Donnybrook Garage Duty Lookup</title>
 <style>
-:root{--nav:#1D3462;--nav2:#243a5e;--nav3:#162c52;--yel:#F9BE00;--grn:#009A44;--grn-bg:rgba(0,154,68,.15);--blu:#00A5DF;--blu-bg:rgba(0,165,223,.14);--red:#e84040;--red-bg:rgba(232,64,64,.14);--amb:#F9BE00;--amb-bg:rgba(249,190,0,.16);--wht:#fff;--mut:#8ba3c9;--fnt:#4a6285;--mono:"IBM Plex Mono",monospace;--disp:"Bricolage Grotesque",sans-serif;--body:"Hanken Grotesque",sans-serif}
+:root{
+--nav:#080e1c;--nav2:#0f1a2e;--nav3:#0d1726;
+--yel:#F9BE00;--grn:#00c48c;--grn-bg:rgba(0,196,140,.12);
+--blu:#06c0e0;--blu-bg:rgba(6,192,224,.12);
+--teal:#0ff0cc;--teal-dim:rgba(0,255,200,.08);
+--red:#e84040;--red-bg:rgba(232,64,64,.14);
+--amb:#F9BE00;--amb-bg:rgba(249,190,0,.16);
+--wht:#e8f0fe;--mut:#4a6a8a;--fnt:#2a4060;
+--mono:"IBM Plex Mono",monospace;--disp:"Bricolage Grotesque",sans-serif;--body:"Hanken Grotesque",sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--body);background:var(--nav);color:var(--wht);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;padding-top:40px}
 .screen{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
 .hidden{display:none!important}
 /* WELCOME */
-#welcome{align-items:center;justify-content:center;gap:18px;padding:48px 28px;background:linear-gradient(155deg,#1D3462 0%,#0d1f40 100%);position:relative}
-.db-badge{width:100px;height:100px;border-radius:26px;background:var(--yel);display:grid;place-items:center;box-shadow:0 10px 40px rgba(249,190,0,.4);margin-bottom:6px}
-.db-badge span{font-family:var(--disp);font-weight:800;font-size:44px;color:var(--nav);letter-spacing:-2px}
+#welcome{align-items:center;justify-content:center;gap:18px;padding:48px 28px;background:linear-gradient(155deg,#080e1c 0%,#051020 60%,#031228 100%);position:relative}
+.db-badge{width:100px;height:100px;border-radius:26px;background:linear-gradient(135deg,#F9BE00,#ff9900);display:grid;place-items:center;box-shadow:0 0 0 1px rgba(249,190,0,.3),0 12px 50px rgba(249,190,0,.35),0 0 80px rgba(249,190,0,.12);margin-bottom:6px}
+.db-badge span{font-family:var(--disp);font-weight:800;font-size:44px;color:#080e1c;letter-spacing:-2px}
 .safety-banner{background:#D32F2F;color:#fff;font-family:var(--disp);font-weight:800;font-size:13px;text-align:center;padding:10px 12px;letter-spacing:.06em;text-transform:uppercase;width:100%;box-sizing:border-box;position:fixed;top:0;left:0;right:0;z-index:9999;animation:pulse-warn 2s ease-in-out infinite;border-bottom:3px solid #FF6F00}
 @keyframes pulse-warn{0%,100%{background:#D32F2F}50%{background:#B71C1C}}
 #welcome h1{font-family:var(--disp);font-size:36px;font-weight:800;color:var(--yel);text-align:center;letter-spacing:-.03em}
-#welcome h2{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--blu);text-align:center}
-#welcome p{font-size:16px;color:var(--mut);text-align:center;margin:4px 0 20px}
-.btn-start{background:var(--yel);color:var(--nav);font-family:var(--disp);font-weight:800;font-size:22px;border:0;border-radius:18px;padding:20px 0;cursor:pointer;width:100%;max-width:340px;box-shadow:0 6px 28px rgba(249,190,0,.45);letter-spacing:-.01em}
+#welcome h2{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--blu);text-align:center;letter-spacing:.01em}
+#welcome p{font-size:15px;color:#3a5878;text-align:center;margin:4px 0 20px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.btn-start{background:linear-gradient(135deg,#F9BE00,#ff9900);color:#080e1c;font-family:var(--disp);font-weight:800;font-size:22px;border:0;border-radius:18px;padding:20px 0;cursor:pointer;width:100%;max-width:340px;box-shadow:0 0 0 1px rgba(249,190,0,.4),0 6px 36px rgba(249,190,0,.4);letter-spacing:-.01em;transition:.15s}
+.btn-start:active{transform:scale(.97)}
 .ver{font-family:var(--mono);font-size:11px;color:var(--fnt);position:absolute;bottom:100px;text-align:center}
 .upd-foot{font-family:var(--mono);font-size:11px;color:var(--fnt);text-align:center;padding:18px 0 24px}
 /* BUS ANIMATION */
 #welcome{padding-bottom:106px}
 .road-wrap{position:absolute;bottom:0;left:0;right:0;height:106px;overflow:hidden}
-.road-surface{position:absolute;inset:0;background:#1c2438}
-.road-kerb{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--grn),var(--yel),var(--blu))}
+.road-surface{position:absolute;inset:0;background:#040910}
+.road-kerb{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00c48c,#F9BE00,#06c0e0)}
 .road-line{position:absolute;top:58px;left:0;width:400%;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 50px,transparent 50px 110px);animation:rscroll .75s linear infinite}
 @keyframes rscroll{to{transform:translateX(-110px)}}
 .bus-outer{position:absolute;bottom:10px;line-height:0}
@@ -37,22 +46,26 @@ body{font-family:var(--body);background:var(--nav);color:var(--wht);min-height:1
 @keyframes brun2{from{transform:translateX(105vw)}to{transform:translateX(-230px)}}
 @keyframes brun3{from{transform:translateX(105vw)}to{transform:translateX(-160px)}}
 
-.stripe{position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--grn) 0%,var(--yel) 50%,var(--blu) 100%)}
+.stripe{position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#00c48c 0%,#F9BE00 50%,#06c0e0 100%)}
+.admin-link{position:absolute;top:52px;right:16px;background:rgba(6,192,224,.1);border:1px solid rgba(6,192,224,.25);color:var(--blu);font-family:var(--mono);font-size:11px;font-weight:700;border-radius:8px;padding:6px 12px;text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:.15s}
+.admin-link:hover{background:rgba(6,192,224,.2);border-color:rgba(6,192,224,.5)}
 /* SEARCH */
 #search{background:var(--nav)}
-.shdr{background:var(--nav3);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--yel)}
+.shdr{background:var(--nav3);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:2px solid #F9BE00}
+.admin-btn{background:rgba(6,192,224,.1);border:1px solid rgba(6,192,224,.25);color:var(--blu);font-family:var(--mono);font-size:11px;font-weight:700;border-radius:8px;padding:7px 11px;cursor:pointer;text-decoration:none;letter-spacing:.04em;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.admin-btn:hover{background:rgba(6,192,224,.2)}
 .back-btn{background:none;border:1.5px solid rgba(255,255,255,.2);color:var(--wht);border-radius:10px;padding:8px 14px;font-size:18px;cursor:pointer;line-height:1}
 .db-sm{width:38px;height:38px;border-radius:10px;background:var(--yel);display:grid;place-items:center;flex:none}
 .db-sm span{font-family:var(--disp);font-weight:800;font-size:17px;color:var(--nav)}
 .hdr-t{font-family:var(--disp);font-weight:700;font-size:18px;flex:1}
 .sbody{padding:22px 16px;display:flex;flex-direction:column;gap:18px}
 .flbl{font-family:var(--body);font-size:12px;font-weight:700;color:var(--blu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
-#duty-q{width:100%;background:var(--nav2);border:2.5px solid rgba(0,165,223,.35);border-radius:14px;color:var(--wht);font-family:var(--mono);font-size:24px;padding:16px 18px;outline:none;letter-spacing:.04em}
-#duty-q:focus{border-color:var(--yel);box-shadow:0 0 0 4px rgba(249,190,0,.18)}
+#duty-q{width:100%;background:var(--nav2);border:2.5px solid rgba(6,192,224,.25);border-radius:14px;color:var(--wht);font-family:var(--mono);font-size:24px;padding:16px 18px;outline:none;letter-spacing:.04em}
+#duty-q:focus{border-color:var(--yel);box-shadow:0 0 0 4px rgba(249,190,0,.15)}
 #duty-q::placeholder{color:var(--fnt);font-size:15px;letter-spacing:0}
 .dtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .dtab{border:2px solid rgba(255,255,255,.1);background:var(--nav2);color:var(--mut);font-family:var(--disp);font-weight:700;font-size:15px;padding:15px 4px;border-radius:12px;cursor:pointer;text-align:center;transition:.14s}
-.dtab.on{background:var(--blu);border-color:var(--blu);color:var(--wht);box-shadow:0 2px 14px rgba(0,165,223,.45)}
+.dtab.on{background:var(--blu);border-color:var(--blu);color:#080e1c;font-weight:800;box-shadow:0 2px 14px rgba(6,192,224,.4)}
 .btn-srch{background:var(--grn);color:var(--wht);font-family:var(--disp);font-weight:800;font-size:20px;border:0;border-radius:15px;padding:20px;cursor:pointer;width:100%;box-shadow:0 4px 20px rgba(0,154,68,.4)}
 #res{padding:0 16px 40px}
 /* MATCHES */
@@ -63,9 +76,9 @@ body{font-family:var(--body);background:var(--nav);color:var(--wht);min-height:1
 .minfo{flex:1}.mtimes{font-family:var(--mono);font-size:16px}.mzone{font-size:12px;color:var(--mut);margin-top:2px}
 .marr{color:var(--fnt);font-size:22px}
 /* CARD */
-.card{background:var(--nav2);border-radius:22px;overflow:hidden;border:1px solid rgba(0,165,223,.25);margin-top:10px}
-.card-hdr{background:var(--nav3);padding:18px 18px 16px;border-bottom:3px solid var(--yel)}
-.c-rte{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blu);letter-spacing:.06em;margin-bottom:4px}
+.card{background:var(--nav2);border-radius:22px;overflow:hidden;border:1px solid rgba(6,192,224,.2);margin-top:10px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
+.card-hdr{background:var(--nav3);padding:18px 18px 16px;border-bottom:3px solid #F9BE00}
+.c-rte{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blu);letter-spacing:.06em;margin-bottom:4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .c-num{font-family:var(--disp);font-weight:800;font-size:34px;color:var(--yel);line-height:1}
 .c-times{font-family:var(--mono);font-size:21px;font-weight:600;margin-top:10px;display:flex;align-items:center;gap:10px}
 .c-lbl{font-family:var(--body);font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;display:block}
@@ -136,10 +149,11 @@ body{font-family:var(--body);background:var(--nav);color:var(--wht);min-height:1
 <div class="safety-banner">&#9888;&#65039; DON&#8217;T USE MOBILE WHILE DRIVING &#9888;&#65039;</div>
 <div class="screen" id="welcome">
  <div class="stripe"></div>
+ <a class="admin-link" href="/admin.html" title="Admin duty editor">⚙ Admin</a>
  <div class="db-badge"><span>DB</span></div>
  <h1>Dublin Bus</h1>
  <h2>Donnybrook Garage</h2>
- <p>Driver Duty Lookup</p>
+ <p>Driver Duty Lookup · Live</p>
  <button class="btn-start" onclick="goSearch()">Get Started &rarr;</button>
  <span class="ver" id="vcnt"></span>
  <div class="road-wrap">
@@ -156,6 +170,7 @@ body{font-family:var(--body);background:var(--nav);color:var(--wht);min-height:1
   <button class="back-btn" onclick="goWelcome()">&larr;</button>
   <div class="db-sm"><span>DB</span></div>
   <span class="hdr-t">Duty Lookup</span>
+  <a class="admin-btn" href="/admin.html">⚙ Admin</a>
  </div>
  <div class="sbody">
   <div>
