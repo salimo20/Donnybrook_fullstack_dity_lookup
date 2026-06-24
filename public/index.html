@@ -1,1 +1,616 @@
-placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Donnybrook Garage Duty Lookup</title>
+<style>
+:root{--nav:#1D3462;--nav2:#243a5e;--nav3:#162c52;--yel:#F9BE00;--grn:#009A44;--grn-bg:rgba(0,154,68,.15);--blu:#00A5DF;--blu-bg:rgba(0,165,223,.14);--red:#e84040;--red-bg:rgba(232,64,64,.14);--amb:#F9BE00;--amb-bg:rgba(249,190,0,.16);--wht:#fff;--mut:#8ba3c9;--fnt:#4a6285;--mono:"IBM Plex Mono",monospace;--disp:"Bricolage Grotesque",sans-serif;--body:"Hanken Grotesque",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:var(--nav);color:var(--wht);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;padding-top:40px}
+.screen{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.hidden{display:none!important}
+/* WELCOME */
+#welcome{align-items:center;justify-content:center;gap:18px;padding:48px 28px;background:linear-gradient(155deg,#1D3462 0%,#0d1f40 100%);position:relative}
+.db-badge{width:100px;height:100px;border-radius:26px;background:var(--yel);display:grid;place-items:center;box-shadow:0 10px 40px rgba(249,190,0,.4);margin-bottom:6px}
+.db-badge span{font-family:var(--disp);font-weight:800;font-size:44px;color:var(--nav);letter-spacing:-2px}
+.safety-banner{background:#D32F2F;color:#fff;font-family:var(--disp);font-weight:800;font-size:13px;text-align:center;padding:10px 12px;letter-spacing:.06em;text-transform:uppercase;width:100%;box-sizing:border-box;position:fixed;top:0;left:0;right:0;z-index:9999;animation:pulse-warn 2s ease-in-out infinite;border-bottom:3px solid #FF6F00}
+@keyframes pulse-warn{0%,100%{background:#D32F2F}50%{background:#B71C1C}}
+#welcome h1{font-family:var(--disp);font-size:36px;font-weight:800;color:var(--yel);text-align:center;letter-spacing:-.03em}
+#welcome h2{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--blu);text-align:center}
+#welcome p{font-size:16px;color:var(--mut);text-align:center;margin:4px 0 20px}
+.btn-start{background:var(--yel);color:var(--nav);font-family:var(--disp);font-weight:800;font-size:22px;border:0;border-radius:18px;padding:20px 0;cursor:pointer;width:100%;max-width:340px;box-shadow:0 6px 28px rgba(249,190,0,.45);letter-spacing:-.01em}
+.ver{font-family:var(--mono);font-size:11px;color:var(--fnt);position:absolute;bottom:100px;text-align:center}
+.upd-foot{font-family:var(--mono);font-size:11px;color:var(--fnt);text-align:center;padding:18px 0 24px}
+/* BUS ANIMATION */
+#welcome{padding-bottom:106px}
+.road-wrap{position:absolute;bottom:0;left:0;right:0;height:106px;overflow:hidden}
+.road-surface{position:absolute;inset:0;background:#1c2438}
+.road-kerb{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--grn),var(--yel),var(--blu))}
+.road-line{position:absolute;top:58px;left:0;width:400%;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 50px,transparent 50px 110px);animation:rscroll .75s linear infinite}
+@keyframes rscroll{to{transform:translateX(-110px)}}
+.bus-outer{position:absolute;bottom:10px;line-height:0}
+.bus-outer.b1{animation:brun1 12s linear infinite}
+.bus-outer.b2{animation:brun2 17s linear -5s infinite}
+.bus-outer.b3{animation:brun3 22s linear -11s infinite}
+@keyframes brun1{from{transform:translateX(105vw)}to{transform:translateX(-300px)}}
+@keyframes brun2{from{transform:translateX(105vw)}to{transform:translateX(-230px)}}
+@keyframes brun3{from{transform:translateX(105vw)}to{transform:translateX(-160px)}}
+
+.stripe{position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--grn) 0%,var(--yel) 50%,var(--blu) 100%)}
+/* SEARCH */
+#search{background:var(--nav)}
+.shdr{background:var(--nav3);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--yel)}
+.back-btn{background:none;border:1.5px solid rgba(255,255,255,.2);color:var(--wht);border-radius:10px;padding:8px 14px;font-size:18px;cursor:pointer;line-height:1}
+.db-sm{width:38px;height:38px;border-radius:10px;background:var(--yel);display:grid;place-items:center;flex:none}
+.db-sm span{font-family:var(--disp);font-weight:800;font-size:17px;color:var(--nav)}
+.hdr-t{font-family:var(--disp);font-weight:700;font-size:18px;flex:1}
+.sbody{padding:22px 16px;display:flex;flex-direction:column;gap:18px}
+.flbl{font-family:var(--body);font-size:12px;font-weight:700;color:var(--blu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+#duty-q{width:100%;background:var(--nav2);border:2.5px solid rgba(0,165,223,.35);border-radius:14px;color:var(--wht);font-family:var(--mono);font-size:24px;padding:16px 18px;outline:none;letter-spacing:.04em}
+#duty-q:focus{border-color:var(--yel);box-shadow:0 0 0 4px rgba(249,190,0,.18)}
+#duty-q::placeholder{color:var(--fnt);font-size:15px;letter-spacing:0}
+.dtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dtab{border:2px solid rgba(255,255,255,.1);background:var(--nav2);color:var(--mut);font-family:var(--disp);font-weight:700;font-size:15px;padding:15px 4px;border-radius:12px;cursor:pointer;text-align:center;transition:.14s}
+.dtab.on{background:var(--blu);border-color:var(--blu);color:var(--wht);box-shadow:0 2px 14px rgba(0,165,223,.45)}
+.btn-srch{background:var(--grn);color:var(--wht);font-family:var(--disp);font-weight:800;font-size:20px;border:0;border-radius:15px;padding:20px;cursor:pointer;width:100%;box-shadow:0 4px 20px rgba(0,154,68,.4)}
+#res{padding:0 16px 40px}
+/* MATCHES */
+.mlist{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.mitem{background:var(--nav2);border:1px solid rgba(255,255,255,.1);border-radius:15px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px}
+.mitem:active{background:var(--nav3)}
+.mnum{font-family:var(--disp);font-weight:800;font-size:27px;color:var(--yel);min-width:58px}
+.minfo{flex:1}.mtimes{font-family:var(--mono);font-size:16px}.mzone{font-size:12px;color:var(--mut);margin-top:2px}
+.marr{color:var(--fnt);font-size:22px}
+/* CARD */
+.card{background:var(--nav2);border-radius:22px;overflow:hidden;border:1px solid rgba(0,165,223,.25);margin-top:10px}
+.card-hdr{background:var(--nav3);padding:18px 18px 16px;border-bottom:3px solid var(--yel)}
+.c-rte{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blu);letter-spacing:.06em;margin-bottom:4px}
+.c-num{font-family:var(--disp);font-weight:800;font-size:34px;color:var(--yel);line-height:1}
+.c-times{font-family:var(--mono);font-size:21px;font-weight:600;margin-top:10px;display:flex;align-items:center;gap:10px}
+.c-lbl{font-family:var(--body);font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;display:block}
+.c-arr{color:var(--fnt)}
+.c-tag{font-family:var(--body);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-left:6px}
+.c-tag.s{color:var(--grn);background:var(--grn-bg)}.c-tag.r{color:var(--amb);background:var(--amb-bg)}
+.stype{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px;text-transform:uppercase;letter-spacing:.06em;margin-left:6px}
+.st-EARLY{background:rgba(255,160,0,.15);color:#FFB300;border:1px solid rgba(255,160,0,.3)}
+.st-BOGEY{background:rgba(156,39,176,.15);color:#CE93D8;border:1px solid rgba(156,39,176,.3)}
+.st-RELIEF{background:rgba(0,150,136,.15);color:#4DB6AC;border:1px solid rgba(0,150,136,.3)}
+.st-LATE{background:rgba(30,136,229,.15);color:#64B5F6;border:1px solid rgba(30,136,229,.3)}
+.st-NIGHT{background:rgba(100,80,200,.15);color:#9FA8DA;border:1px solid rgba(100,80,200,.3)}
+.st-EARLY_WO{background:rgba(255,111,0,.16);color:#FF8A3D;border:1px solid rgba(255,111,0,.35)}
+.sec-t{font-family:var(--body);font-size:12px;font-weight:700;color:var(--blu);letter-spacing:.1em;text-transform:uppercase;padding:14px 18px 8px;display:flex;align-items:center;gap:8px}
+.sec-t::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+.tplist{padding:4px 10px 10px;display:flex;flex-direction:column;gap:4px}
+.tc-mountjoy{border-left:4px solid #00A5DF!important}
+.tc-bridesglen{border-left:4px solid #009A44!important}
+.tc-loughlinstown{border-left:4px solid #E53935!important}
+.tc-poolbeg{border-left:4px solid #F9BE00!important}
+.tc-belarmine{border-left:4px solid #9C27B0!important}
+.tc-dundrum{border-left:4px solid #F9BE00!important}
+.tc-dun-laoghaire{border-left:4px solid #00A5DF!important}
+.tpr{display:grid;grid-template-columns:94px 1fr;gap:10px;align-items:center;padding:12px 10px;border-radius:12px;background:rgba(255,255,255,.04)}
+.tpt{font-family:var(--mono);font-weight:600;font-size:18px;white-space:nowrap}
+.tpn{font-family:var(--disp);font-weight:700;font-size:16px}
+.tpl{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-left:7px;opacity:.9}
+.tp-rte{font-family:var(--mono);font-size:10px;font-weight:700;margin-left:8px;background:rgba(255,255,255,.14);padding:2px 7px;border-radius:5px;letter-spacing:.04em;vertical-align:middle}
+.hrs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 14px 14px}
+.hbox{background:rgba(255,255,255,.05);border-radius:12px;padding:12px;text-align:center}
+.hk{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.hv{font-family:var(--mono);font-size:21px;font-weight:600;margin-top:4px}
+.hbox.w .hv{color:var(--grn)}.hbox.b .hv{color:var(--blu)}
+.cbox{background:rgba(0,165,223,.1);border:1px solid rgba(0,165,223,.3);border-radius:15px;margin:0 14px 14px;padding:14px 16px}
+.ct{font-size:12px;font-weight:700;color:var(--blu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.clink{display:flex;align-items:center;gap:12px;text-decoration:none;padding:4px 0}
+.cico{width:44px;height:44px;border-radius:12px;background:var(--blu);display:grid;place-items:center;flex:none;font-size:22px}
+.cnum{font-family:var(--mono);font-weight:600;font-size:19px;color:var(--wht)}
+.crte{font-size:12px;color:var(--mut)}
+.btn-again{margin:0 14px 20px;background:transparent;border:2px solid rgba(255,255,255,.12);color:var(--wht);font-family:var(--disp);font-weight:700;font-size:16px;border-radius:13px;padding:15px;cursor:pointer;display:block;width:calc(100% - 28px);text-align:center}
+.nores{text-align:center;padding:44px 16px;color:var(--mut);font-family:var(--mono);font-size:14px;line-height:1.8}
+.sect-lbl{font-size:13px;font-weight:700;color:var(--blu);letter-spacing:.06em;text-transform:uppercase;padding:14px 0 10px}
+/* ROUTE VIEW */
+.c-rte{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:rgba(0,165,223,.5)}
+.card-hdr{position:relative}
+.btn-dl{position:absolute;top:0;right:0;background:#F9BE00;border:none;color:#1D3462;font-family:var(--body);font-weight:700;font-size:11px;border-radius:10px;padding:7px 12px;cursor:pointer;letter-spacing:.01em;box-shadow:0 2px 8px rgba(0,0,0,.18);white-space:nowrap}
+.btn-dl,.c-rte,.btn,button{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.btn-dl:active{background:#e0a800;transform:scale(.97)}
+.c-tm{font-family:var(--mono);font-size:12px;color:var(--mut);letter-spacing:.04em;margin-top:2px;display:flex;align-items:center;gap:6px}
+.c-tm b{color:var(--yel);font-weight:700}
+.c-tm .tm-ico{font-size:14px;line-height:1}
+.rv-hdr{background:var(--nav3);padding:18px 16px;border-bottom:2px solid var(--yel)}
+.rv-rte{font-family:var(--disp);font-weight:800;font-size:28px;color:var(--yel)}
+.rv-termini{font-family:var(--body);font-size:14px;color:var(--blu);margin-top:4px}
+.rv-dirtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px 0}
+.rv-dirtab{border:2px solid rgba(255,255,255,.1);background:var(--nav2);color:var(--mut);font-family:var(--body);font-weight:700;font-size:13px;padding:12px 6px;border-radius:11px;cursor:pointer;text-align:center}
+.rv-dirtab.on{background:var(--blu);border-color:var(--blu);color:var(--wht)}
+.rv-list{padding:14px 16px 30px;display:flex;flex-direction:column;gap:0}
+.rv-stop{display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;text-decoration:none;color:inherit}
+.rv-stop:active{background:rgba(255,255,255,.04)}
+.rv-num{font-family:var(--mono);font-size:12px;color:var(--fnt);min-width:28px}
+.rv-name{font-family:var(--body);font-size:15px;flex:1}
+.rv-pin{font-size:16px;opacity:.6}
+.rv-note{padding:14px 16px;font-size:13px;color:var(--mut);font-family:var(--body);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="safety-banner">&#9888;&#65039; DON&#8217;T USE MOBILE WHILE DRIVING &#9888;&#65039;</div>
+<div class="screen" id="welcome">
+ <div class="stripe"></div>
+ <div class="db-badge"><span>DB</span></div>
+ <h1>Dublin Bus</h1>
+ <h2>Donnybrook Garage</h2>
+ <p>Driver Duty Lookup</p>
+ <button class="btn-start" onclick="goSearch()">Get Started &rarr;</button>
+ <span class="ver" id="vcnt"></span>
+ <div class="road-wrap">
+  <div class="road-surface"></div>
+  <div class="road-kerb"></div>
+  <div class="road-line"></div>
+  <div class="bus-outer b1"><svg viewBox="0 0 190 90" width="190" height="90" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="9" width="186" height="65" rx="7" fill="#009A44"/><rect x="4" y="7" width="182" height="21" rx="7" fill="#006b2e"/><rect x="43" y="11" width="30" height="19" rx="3" fill="#6ddb8c" opacity=".92"/><rect x="76" y="11" width="30" height="19" rx="3" fill="#6ddb8c" opacity=".92"/><rect x="109" y="11" width="30" height="19" rx="3" fill="#6ddb8c" opacity=".88"/><rect x="142" y="11" width="30" height="19" rx="3" fill="#6ddb8c" opacity=".82"/><rect x="2" y="9" width="39" height="65" rx="7" fill="#006b2e"/><rect x="5" y="11" width="31" height="23" rx="4" fill="#6ddb8c" opacity=".8"/><rect x="17" y="32" width="17" height="42" rx="2" fill="#009A44" opacity=".5"/><rect x="6" y="13" width="27" height="11" rx="2" fill="#ffffff"/><text x="19" y="21" text-anchor="middle" font-size="7" font-weight="900" font-family="Arial Black,sans-serif" fill="#006b2e">DB</text><rect x="43" y="34" width="141" height="31" rx="5" fill="#ffffff"/><text x="113" y="55" text-anchor="middle" font-size="17" font-weight="900" font-family="Arial Black,sans-serif" fill="#006b2e" letter-spacing="1">DB1</text><rect x="16" y="63" width="158" height="4" rx="2" fill="#006b2e"/><path d="M26 67 Q38 61 50 67" fill="#009A44"/><path d="M140 67 Q152 61 164 67" fill="#009A44"/><circle cx="38" cy="77" r="12" fill="#1a1a1a"/><circle cx="38" cy="77" r="7" fill="#2c2c2c"/><circle cx="38" cy="77" r="3" fill="#555"/><circle cx="152" cy="77" r="12" fill="#1a1a1a"/><circle cx="152" cy="77" r="7" fill="#2c2c2c"/><circle cx="152" cy="77" r="3" fill="#555"/></svg></div>
+  <div class="bus-outer b2"><svg viewBox="0 0 148 70" width="148" height="70" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="144" height="50" rx="7" fill="#1D3462"/><rect x="4" y="5" width="140" height="16" rx="7" fill="#142448"/><rect x="35" y="9" width="23" height="14" rx="3" fill="#00A5DF" opacity=".92"/><rect x="60" y="9" width="23" height="14" rx="3" fill="#00A5DF" opacity=".92"/><rect x="85" y="9" width="23" height="14" rx="3" fill="#00A5DF" opacity=".88"/><rect x="110" y="9" width="23" height="14" rx="3" fill="#00A5DF" opacity=".82"/><rect x="2" y="7" width="31" height="50" rx="7" fill="#142448"/><rect x="5" y="9" width="25" height="17" rx="4" fill="#00A5DF" opacity=".8"/><rect x="13" y="24" width="14" height="33" rx="2" fill="#1D3462" opacity=".5"/><rect x="6" y="11" width="21" height="8" rx="2" fill="#F9BE00"/><text x="16" y="16" text-anchor="middle" font-size="6" font-weight="900" font-family="Arial Black,sans-serif" fill="#1D3462">DB</text><rect x="35" y="26" width="107" height="24" rx="5" fill="#F9BE00"/><text x="88" y="42" text-anchor="middle" font-size="13" font-weight="900" font-family="Arial Black,sans-serif" fill="#1D3462" letter-spacing="1">GARAGE</text><rect x="12" y="49" width="124" height="4" rx="2" fill="#142448"/><path d="M20 53 Q29 49 38 53" fill="#1D3462"/><path d="M109 53 Q118 49 127 53" fill="#1D3462"/><circle cx="29" cy="60" r="9" fill="#1a1a1a"/><circle cx="29" cy="60" r="5" fill="#2c2c2c"/><circle cx="29" cy="60" r="2" fill="#555"/><circle cx="118" cy="60" r="9" fill="#1a1a1a"/><circle cx="118" cy="60" r="5" fill="#2c2c2c"/><circle cx="118" cy="60" r="2" fill="#555"/></svg></div>
+  <div class="bus-outer b3"><svg viewBox="0 0 108 51" width="108" height="51" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="104" height="36" rx="7" fill="#F9BE00"/><rect x="4" y="3" width="100" height="12" rx="7" fill="#1D3462"/><rect x="26" y="7" width="17" height="10" rx="3" fill="#d8ecfa" opacity=".92"/><rect x="44" y="7" width="17" height="10" rx="3" fill="#d8ecfa" opacity=".92"/><rect x="62" y="7" width="17" height="10" rx="3" fill="#d8ecfa" opacity=".88"/><rect x="80" y="7" width="17" height="10" rx="3" fill="#d8ecfa" opacity=".82"/><rect x="2" y="5" width="22" height="36" rx="7" fill="#1D3462"/><rect x="5" y="7" width="18" height="13" rx="4" fill="#d8ecfa" opacity=".8"/><rect x="9" y="17" width="10" height="24" rx="2" fill="#F9BE00" opacity=".5"/><rect x="6" y="9" width="15" height="6" rx="2" fill="#1D3462"/><text x="13" y="13" text-anchor="middle" font-size="6" font-weight="900" font-family="Arial Black,sans-serif" fill="#F9BE00">DB</text><rect x="26" y="19" width="76" height="17" rx="5" fill="#1D3462"/><text x="64" y="30" text-anchor="middle" font-size="9" font-weight="900" font-family="Arial Black,sans-serif" fill="#F9BE00" letter-spacing="1">DONNYBROOK</text><rect x="9" y="36" width="90" height="4" rx="2" fill="#1D3462"/><path d="M15 40 Q21 37 27 40" fill="#F9BE00"/><path d="M80 40 Q86 37 92 40" fill="#F9BE00"/><circle cx="21" cy="44" r="6" fill="#1a1a1a"/><circle cx="21" cy="44" r="3" fill="#2c2c2c"/><circle cx="21" cy="44" r="1" fill="#555"/><circle cx="86" cy="44" r="6" fill="#1a1a1a"/><circle cx="86" cy="44" r="3" fill="#2c2c2c"/><circle cx="86" cy="44" r="1" fill="#555"/></svg></div>
+ </div>
+</div>
+<div class="screen hidden" id="search">
+ <div class="shdr">
+  <button class="back-btn" onclick="goWelcome()">&larr;</button>
+  <div class="db-sm"><span>DB</span></div>
+  <span class="hdr-t">Duty Lookup</span>
+ </div>
+ <div class="sbody">
+  <div>
+   <div class="flbl">Duty Number</div>
+   <input id="duty-q" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="DZx/xx  •  R13/12  •  L25/02">
+  </div>
+  <div>
+   <div class="flbl">Day</div>
+   <div class="dtabs">
+    <button class="dtab on" data-day="Mon-Fri">Weekdays</button>
+    <button class="dtab" data-day="Saturday">Saturday</button>
+    <button class="dtab" data-day="Sunday">Sunday</button>
+   </div>
+  </div>
+  <button class="btn-srch" onclick="doSearch()">&#128269;&nbsp; Search Duty</button>
+ </div>
+ <div id="res"></div>
+ <div class="upd-foot" id="upd-search"></div>
+</div>
+<div class="screen hidden" id="routeview">
+ <div class="shdr">
+  <button class="back-btn" onclick="closeRouteView()">&larr;</button>
+  <div class="db-sm"><span>DB</span></div>
+  <span class="hdr-t">Route Map</span>
+ </div>
+ <div id="rv-body"></div>
+ <div class="upd-foot" id="upd-route"></div>
+</div>
+
+<script>
+
+const ROUTE_STOPS=JSON.parse("{\"full\":{\"4\":{\"termini\":[\"Monkstown Ave.\",\"Heuston Station\"],\"out\":[\"Monkstown Ave.\",\"Rowan Park (Rockford Park)\",\"Rowan Park (Stradbrook Rd.)\",\"Newtown Park Ave. Junction\",\"Newtown Park Ave./Temple Rd.\",\"Frascati Rd.\",\"Williamstown Post Office\",\"Rock Rd. (Booterstown Ave.)\",\"Rock Rd. (St. Helen's Rd.)\",\"Merrion Gates\",\"Merrion Rd. (St. Vincent's Hospital)\",\"Merrion Rd. (Shrewsbury Rd.)\",\"Ballsbridge (Anglesea Rd.)\",\"Pembroke Rd.\",\"Northumberland Rd. (Haddington Rd.)\",\"Mount St. (Holles St.)\",\"Clare St.\",\"Aston Quay\",\"Heuston Rail Station\"],\"in\":[\"Heuston Rail Station\",\"Bachelors Walk\",\"Clare St.\",\"Mount St. (Holles St.)\",\"Northumberland Rd. (Haddington Rd.)\",\"Pembroke Rd.\",\"Ballsbridge (Anglesea Rd.)\",\"Merrion Rd. (Shrewsbury Rd.)\",\"Merrion Rd. (St. Vincent's Hospital)\",\"Merrion Gates\",\"Rock Rd. (St. Helen's Rd.)\",\"Rock Rd. (Booterstown Ave.)\",\"Williamstown Post Office\",\"Frascati Rd.\",\"Newtown Park Ave./Temple Rd.\",\"Newtown Park Ave. Junction\",\"Rowan Park (Stradbrook Rd.)\",\"Rowan Park (Rockford Park)\",\"Monkstown Ave.\"]},\"7\":{\"termini\":[\"Mountjoy Sq.\",\"Brides Glen (Luas)\"],\"out\":[\"Mountjoy Sq. (Mountjoy Sq. North)\",\"O'Connell St. (Dublin Bus)\",\"Clare St. (Lincoln Place)\",\"Merrion Sq. (Holles St.)\",\"Northumberland Rd. (Haddington Rd.)\",\"Northumberland Rd. (Lansdowne Pk.)\",\"Ballsbridge (RDS)\",\"Merrion Rd. (Shrewsbury Rd.)\",\"Merrion Rd. (St. Vincent's Hospital)\",\"Rock Rd. (Merrion Gates)\",\"Rock Rd. (St. Helen's Rd.)\",\"Rock Rd. (Booterstown Ave.)\",\"Rock Rd. (Blackrock Clinic)\",\"Frascati Rd. (Frascati Centre)\",\"Frascati Rd. (Carysfort Rd.)\",\"Monkstown Rd. (Montpellier Parade)\",\"Monkstown Rd. (Carrickbrennan Rd.)\",\"Dunleary Hill (De Vesci Terrace)\",\"George's St. (Mulgrave St.)\",\"Glenageary Rd. (Corrig Rd.)\",\"Glenageary Rd. (Holmstown Ave.)\",\"Sallyglen Rd. (Sallynoggin Rd.)\",\"Sallyglen Rd. (Arnold Grove)\",\"Sallyglen Rd. (Rochestown Avenue)\",\"Churchview Rd. (Granville Rd.)\",\"Churchview Rd. (Willow Vale)\",\"Wyattville Rd. (Druid Valley)\",\"Brides Glen (Luas Station)\"],\"in\":[\"Brides Glen (Luas Station)\",\"Wyattville Rd. (Druid Valley)\",\"Churchview Rd. (Willow Vale)\",\"Churchview Rd. (Granville Rd.)\",\"Sallyglen Rd. (Rochestown Avenue)\",\"Sallyglen Rd. (Arnold Grove)\",\"Sallyglen Rd. (Sallynoggin Rd.)\",\"Glenageary Rd. (Holmstown Ave.)\",\"Glenageary Rd. (Corrig Rd.)\",\"George's St. (Mulgrave St.)\",\"Dunleary Hill (De Vesci Terrace)\",\"Monkstown Rd. (Carrickbrennan Rd.)\",\"Monkstown Rd. (Montpellier Parade)\",\"Frascati Rd. (Carysfort Rd.)\",\"Frascati Rd. (Frascati Centre)\",\"Rock Rd. (Blackrock Clinic)\",\"Rock Rd. (Booterstown Ave.)\",\"Rock Rd. (St. Helen's Rd.)\",\"Rock Rd. (Merrion Gates)\",\"Merrion Rd. (St. Vincent's Hospital)\",\"Merrion Rd. (Shrewsbury Rd.)\",\"Ballsbridge (RDS)\",\"Northumberland Rd. (Lansdowne Pk.)\",\"Northumberland Rd. (Haddington Rd.)\",\"Merrion Sq. (Holles St.)\",\"Clare St. (Lincoln Place)\",\"O'Connell St. (Dublin Bus)\",\"Mountjoy Sq. (Mountjoy Sq. North)\"]},\"7A\":{\"termini\":[\"Mountjoy Sq.\",\"Loughlinstown\"],\"out\":[\"Mountjoy Sq. (Mountjoy Sq. North)\",\"O'Connell St. (Dublin Bus)\",\"Clare St. (Lincoln Place)\",\"Merrion Sq. (Holles St.)\",\"Northumberland Rd. (Haddington Rd.)\",\"Northumberland Rd. (Lansdowne Pk.)\",\"Ballsbridge (RDS)\",\"Merrion Rd. (Shrewsbury Rd.)\",\"Merrion Rd. (St. Vincent's Hospital)\",\"Merrion Gates\",\"Rock Rd. (St. Helen's Rd.)\",\"Rock Rd. (Booterstown Ave.)\",\"Rock Rd. (Blackrock Clinic)\",\"Frascati Rd. (Frascati Centre)\",\"Newtown Ave. (Church)\",\"Monkstown Rd. (Montpellier Parade)\",\"Monkstown Rd. (Carrickbrennan Rd.)\",\"Dunleary Hill (De Vesci Terrace)\",\"George's St. (Mulgrave St.)\",\"Glenageary Rd. (Corrig Rd.)\",\"Glenageary Rd. (Holmstown Ave.)\",\"Sallynoggin Rd. (Sarsfield St.)\",\"Pearse St. (Pearse Villas)\",\"Rochestown Ave. (Killiney Shopping Centre)\",\"Churchview Rd. (Granville Rd.)\",\"Churchview Rd. (Willow Vale)\",\"Loughlinstown Pk. (Loughlinstown Wood)\"],\"in\":[\"Loughlinstown Pk. (Loughlinstown Wood)\",\"Churchview Rd. (Willow Vale)\",\"Churchview Rd. (Granville Rd.)\",\"Rochestown Ave. (Killiney Shopping Centre)\",\"Pearse St. (Pearse Villas)\",\"Sallynoggin Rd. (Sarsfield St.)\",\"Glenageary Rd. (Holmstown Ave.)\",\"Glenageary Rd. (Corrig Rd.)\",\"George's St. (Mulgrave St.)\",\"Dunleary Hill (De Vesci Terrace)\",\"Monkstown Rd. (Carrickbrennan Rd.)\",\"Monkstown Rd. (Montpellier Parade)\",\"Newtown Ave. (Church)\",\"Frascati Rd. (Frascati Centre)\",\"Rock Rd. (Blackrock Clinic)\",\"Rock Rd. (Booterstown Ave.)\",\"Rock Rd. (St. Helen's Rd.)\",\"Merrion Gates\",\"Merrion Rd. (St. Vincent's Hospital)\",\"Merrion Rd. (Shrewsbury Rd.)\",\"Ballsbridge (RDS)\",\"Northumberland Rd. (Lansdowne Pk.)\",\"Northumberland Rd. (Haddington Rd.)\",\"Merrion Sq. (Holles St.)\",\"Clare St. (Lincoln Place)\",\"O'Connell St. (Dublin Bus)\",\"Mountjoy Sq. (Mountjoy Sq. North)\"]},\"11\":{\"termini\":[\"Sandyford Business District\",\"Wadelai Park\"],\"out\":[\"Sandyford Business District (Blackthorn Rd.)\",\"Kilmacud (Redesdale Rd.)\",\"Kilmacud Rd. (Drummartin Rd.)\",\"Goatstown\",\"Goatstown Rd. (Larchfield Rd.)\",\"Roebuck Rd. (Goatstown Rd.)\",\"Clonskeagh Rd. (Bird Ave.)\",\"Clonskeagh Rd. (Whitebeam Rd.)\",\"Clonskeagh Rd. (Vergemount Rd.)\",\"Sandford Rd. (Marlboro Rd.)\",\"Ranelagh (Chelmsford Rd.)\",\"Leeson St. (Appian Way)\",\"Leeson St. Bridge\",\"Leeson St. (Pembroke St.)\",\"Kildare St. / Dawson St.\",\"O'Connell St.\",\"Dorset St. (North Frederick St.)\",\"Dorset St. (North Circular Rd.)\",\"Drumcondra Rail Station\",\"Drumcondra Rd. Upr. (Clonturk Park)\",\"Home Farm Rd. (Ferguson Rd.)\",\"Ballymun Rd.\",\"Wadelai Park\"],\"in\":[\"Wadelai Park\",\"Ballymun Rd.\",\"Home Farm Rd. (Ferguson Rd.)\",\"Drumcondra Rd. Upr. (Clonturk Park)\",\"Drumcondra Rail Station\",\"Dorset St. (North Circular Rd.)\",\"Dorset St. (North Frederick St.)\",\"O'Connell St.\",\"Kildare St. / Dawson St.\",\"Leeson St. (Pembroke St.)\",\"Leeson St. Bridge\",\"Leeson St. (Appian Way)\",\"Ranelagh (Chelmsford Rd.)\",\"Sandford Rd. (Marlboro Rd.)\",\"Clonskeagh Rd. (Vergemount Rd.)\",\"Clonskeagh Rd. (Whitebeam Rd.)\",\"Clonskeagh Rd. (Bird Ave.)\",\"Roebuck Rd. (Goatstown Rd.)\",\"Goatstown Rd. (Larchfield Rd.)\",\"Goatstown\",\"Kilmacud Rd. (Drummartin Rd.)\",\"Kilmacud (Redesdale Rd.)\",\"Sandyford Business District (Blackthorn Rd.)\"]},\"11B\":{\"termini\":[\"Donnybrook Road\",\"Phoenix Park\"],\"out\":[\"Donnybrook Road\",\"Leeson St. Upper (Appian Way)\",\"Leeson St. Bridge\",\"Leeson St. (Pembroke St.)\",\"Kildare St./Dawson St.\",\"O'Connell St.\",\"Parnell Square West\",\"North Circular Road\",\"Phoenix Park (Infirmary Road)\"],\"in\":[\"Phoenix Park (Infirmary Rd.)\",\"North Circular Road\",\"Parnell Square East\",\"O'Connell St.\",\"Kildare St./Dawson St.\",\"Leeson St. (Pembroke St.)\",\"Leeson St. Bridge\",\"Sussex Road\",\"Donnybrook Road\"]},\"13\":{\"termini\":[\"Mountjoy Sq.\",\"Grange Castle\"],\"out\":[\"Mountjoy Sq.\",\"Parnell Sq. East\",\"O'Connell St.\",\"Lord Edward St.\",\"Thomas St. (Francis St.)\",\"Thomas St. (Watling St.)\",\"James St. (St. James's Hospital)\",\"Old Kilmainham (Junction Brookfield Rd.)\",\"Emmet Rd. (Kilmainham Cross)\",\"Tyrconnell Rd. (Blacklion)\",\"Naas Rd. (Canal Bridge)\",\"Naas Rd. (Bluebell)\",\"Naas Rd. (Robin Hood Rd.)\",\"Naas Rd. (Long Mile Rd.)\",\"Naas Rd. (Fox and Geese)\",\"Naas Rd. (John Sisk and Sons)\",\"Naas Rd. (Red Cow Inn)\",\"Monastery Corner\",\"Woodford Walk\",\"Watery Lane (Riversdale)\",\"Clondalkin Village\",\"St. Ronan's Church (Junction Oldcastle Drive)\",\"Grange Castle Business Park\"],\"in\":[\"Grange Castle Business Park\",\"St. Ronan's Church (Junction Oldcastle Drive)\",\"Clondalkin Village\",\"Watery Lane (Riversdale)\",\"Woodford Walk\",\"Monastery Corner\",\"Naas Rd. (Red Cow Inn)\",\"Naas Rd. (John Sisk and Sons)\",\"Naas Rd. (Fox and Geese)\",\"Naas Rd. (Long Mile Rd.)\",\"Naas Rd. (Robin Hood Rd.)\",\"Naas Rd. (Bluebell)\",\"Naas Rd. (Canal Bridge)\",\"Tyrconnell Rd. (Blacklion)\",\"Emmet Rd. (Kilmainham Cross)\",\"Old Kilmainham (Junction Brookfield Rd.)\",\"James St. (St. James's Hospital)\",\"Thomas St. (Watling St.)\",\"Thomas St. (Francis St.)\",\"Lord Edward St.\",\"O'Connell St.\",\"Parnell Sq. West\",\"Mountjoy Sq.\"]},\"14\":{\"termini\":[\"Beaumont (Ardlea Rd.)\",\"Dundrum Luas\"],\"out\":[\"Beaumont (Ardlea Rd.)\",\"Skelly's Lane (Whitethorn Estate)\",\"Beaumont Convalescent Home\",\"Malahide Rd. (Donnycarney Church)\",\"Malahide Rd. (Griffith Ave.)\",\"Fairview (St. Joseph's School)\",\"Annesley Bridge Rd.\",\"Newcomen Bridge\",\"Connolly Rail Station\",\"D'Olier Street / Eden Quay\",\"Sth. Great George's St.\",\"Aungier St. (Bishop St.)\",\"Richmond St. South\",\"Rathmines Rd. Lwr. (Richmond Hill)\",\"Rathmines (Corner Upr. Rathmines Rd.)\",\"Rathgar Rd. (Frankfort Ave.)\",\"Orwell Park (Driving Test Centre)\",\"Braemor Park (Mount Carmel Hospital)\",\"Braemor Rd. (Redwood Court)\",\"Braemor Rd. (Churchtown Rd. Upr.)\",\"Barton Rd. East (Beaumont Ave.)\",\"Barton Rd. East (Meadow Villas)\",\"Broadford Rd. (Marley Court)\",\"Ballinteer\",\"Broadford Rd. (Corner Broadford Rise)\",\"Ballinteer Rd. (Ballinteer Park)\",\"Ballinteer Rd. (Wyckham Park)\",\"Dundrum (Church)\",\"Dundrum Luas Station\"],\"in\":[\"Dundrum Luas Station\",\"Dundrum (Church)\",\"Ballinteer Rd. (Wyckham Park)\",\"Ballinteer Rd. (Ballinteer Park)\",\"Broadford Rd. (Corner Broadford Rise)\",\"Ballinteer\",\"Broadford Rd. (Marley Court)\",\"Barton Rd. East (Meadow Villas)\",\"Barton Rd. East (Beaumont Ave.)\",\"Braemor Rd. (Churchtown Rd. Upr.)\",\"Braemor Rd. (Redwood Court)\",\"Braemor Park (Mount Carmel Hospital)\",\"Orwell Park (Driving Test Centre)\",\"Rathgar Rd. (Frankfort Ave.)\",\"Rathmines (Corner Upr. Rathmines Rd.)\",\"Rathmines Rd. Lwr. (Richmond Hill)\",\"Richmond St. South\",\"Aungier St. (Bishop St.)\",\"Sth. Great George's St.\",\"D'Olier Street / Eden Quay\",\"Connolly Rail Station\",\"Newcomen Bridge\",\"Annesley Bridge Rd.\",\"Fairview (St. Joseph's School)\",\"Malahide Rd. (Griffith Ave.)\",\"Malahide Rd. (Donnycarney Church)\",\"Beaumont Convalescent Home\",\"Skelly's Lane (Whitethorn Estate)\",\"Beaumont (Ardlea Rd.)\"]},\"15\":{\"termini\":[\"Ballycullen Rd.\",\"Clongriffin\"],\"out\":[\"Ballycullen Rd. (Stocking Ave.)\",\"Ballycullen Rd. (Hunters Crescent)\",\"St. Colmcille's Way (Glenlyon Crescent)\",\"St. Colmcille's Way (Orlagh Park)\",\"Scholarstown Rd. (The Rookery)\",\"Templeogue Bridge\",\"Templeogue Post Office\",\"Templeogue Rd. (Fortfield Rd.)\",\"Templeogue Rd. (Rathdown Park)\",\"Terenure\",\"Rathgar Rd. (Frankfort Ave.)\",\"Rathmines Rd. (Rathgar Rd.)\",\"Rathmines Rd. Lwr. (Richmond Hill)\",\"Richmond St. South\",\"Aungier St. (Bishop St.)\",\"Sth. Great George's St.\",\"Eden Quay\",\"Connolly Rail Station\",\"Newcomen Bridge\",\"Annesley Bridge Rd.\",\"Fairview (St. Joseph's School)\",\"Malahide Rd. (Griffith Ave.)\",\"Malahide Rd. (Donnycarney Church)\",\"Malahide Rd. (Killester Park)\",\"St. Brigid's Rd. (Roundabout)\",\"Brookville Rd. (Ascal Measc)\",\"Malahide Rd. (Newtown Cottages)\",\"Malahide Rd. (Ard na Greine)\",\"Malahide Rd. (Belcamp Rd.)\",\"Malahide Rd. (N32)\",\"Clare Hall\",\"Hole In The Wall Rd. (Father Collins Park)\",\"Clongriffin (Grange Lodge Ave.)\",\"Clongriffin (Sq.)\"],\"in\":[\"Clongriffin (Sq.)\",\"Clongriffin (Grange Lodge Ave.)\",\"Hole In The Wall Rd. (Father Collins Park)\",\"Clare Hall\",\"Malahide Rd. (N32)\",\"Malahide Rd. (Belcamp Rd.)\",\"Malahide Rd. (Ard na Greine)\",\"Malahide Rd. (Newtown Cottages)\",\"Brookville Rd. (Ascal Measc)\",\"St. Brigid's Rd. (Roundabout)\",\"Malahide Rd. (Killester Park)\",\"Malahide Rd. (Donnycarney Church)\",\"Malahide Rd. (Griffith Ave.)\",\"Fairview (St. Joseph's School)\",\"Annesley Bridge Rd.\",\"Newcomen Bridge\",\"Connolly Rail Station\",\"Eden Quay\",\"Sth. Great George's St.\",\"Aungier St. (Bishop St.)\",\"Richmond St. South\",\"Rathmines Rd. Lwr. (Richmond Hill)\",\"Rathmines Rd. (Rathgar Rd.)\",\"Rathgar Rd. (Frankfort Ave.)\",\"Terenure\",\"Templeogue Rd. (Rathdown Park)\",\"Templeogue Rd. (Fortfield Rd.)\",\"Templeogue Post Office\",\"Templeogue Bridge\",\"Scholarstown Rd. (The Rookery)\",\"St. Colmcille's Way (Orlagh Park)\",\"St. Colmcille's Way (Glenlyon Crescent)\",\"Ballycullen Rd. (Hunters Crescent)\",\"Ballycullen Rd. (Stocking Ave.)\"]},\"44\":{\"termini\":[\"DCU\",\"Enniskerry\"],\"out\":[\"DCU\",\"Larkhill\",\"Collins Ave. (Larkhill Rd.)\",\"Drumcondra Rd. Upr. (Griffith Ave.)\",\"Drumcondra Rd. Upr. (Clonturk Park)\",\"Drumcondra Rail Station\",\"Dorset St. (North Circular Rd.)\",\"Dorset St. (North Frederick St.)\",\"O'Connell St.\",\"Merrion Sq. / Clare St.\",\"Earlsfort Terrace\",\"Charlemont St.\",\"Ranelagh Rd. (Dartmouth Rd.)\",\"Ranelagh (Chelmsford Rd.)\",\"Sandford Rd. (Marlboro Rd.)\",\"Milltown (Ramleh Park)\",\"Milltown (Church)\",\"Dundrum Rd. (Bird Ave.)\",\"Dundrum Rd. (Columbanus Rd.)\",\"Dundrum Rd. (Frankfort Park)\",\"Dundrum Rd. (Ballinteer Rd.)\",\"Sandyford Rd. (Dundrum Town Centre)\",\"Sandyford Rd. (Balally Cottages)\",\"Sandyford Corner (Kilcross)\",\"Sandyford Village\",\"Murphystown Cross (Hillcrest)\",\"Murphystown Rd.\",\"Kilgobbin Lane\",\"Stepaside Village\",\"Jamestown (St. Norbert's)\",\"Jamestown House\",\"Goldenball (Glenamuck Rd.)\",\"Ballycorus Rd.\",\"Kilternan (Willis)\",\"Kilternan Hotel\",\"The Scalp (Butlers)\",\"Killegar House\",\"Monastery Corner\",\"Enniskerry (National School)\"],\"in\":[\"Enniskerry (National School)\",\"Monastery Corner\",\"Killegar House\",\"The Scalp (Butlers)\",\"Kilternan Hotel\",\"Kilternan (Willis)\",\"Ballycorus Rd.\",\"Goldenball (Glenamuck Rd.)\",\"Jamestown House\",\"Jamestown (St. Norbert's)\",\"Stepaside Village\",\"Kilgobbin Lane\",\"Murphystown Rd.\",\"Murphystown Cross (Hillcrest)\",\"Sandyford Village\",\"Sandyford Corner (Kilcross)\",\"Sandyford Rd. (Balally Cottages)\",\"Sandyford Rd. (Dundrum Town Centre)\",\"Dundrum Rd. (Ballinteer Rd.)\",\"Dundrum Rd. (Frankfort Park)\",\"Dundrum Rd. (Columbanus Rd.)\",\"Dundrum Rd. (Bird Ave.)\",\"Milltown (Church)\",\"Milltown (Ramleh Park)\",\"Sandford Rd. (Marlboro Rd.)\",\"Ranelagh (Chelmsford Rd.)\",\"Ranelagh Rd. (Dartmouth Rd.)\",\"Charlemont St.\",\"Earlsfort Terrace\",\"Merrion Sq. / Clare St.\",\"O'Connell St.\",\"Dorset St. (North Frederick St.)\",\"Dorset St. (North Circular Rd.)\",\"Drumcondra Rail Station\",\"Drumcondra Rd. Upr. (Clonturk Park)\",\"Drumcondra Rd. Upr. (Griffith Ave.)\",\"Collins Ave. (Larkhill Rd.)\",\"Larkhill\",\"DCU\"]},\"47\":{\"termini\":[\"Poolbeg St.\",\"Belarmine\"],\"out\":[\"Poolbeg St.\",\"Pearse St. (Macken St.)\",\"Ringsend (Thorncastle St.)\",\"Irishtown Rd. (Tritonville Rd.)\",\"Sandymount Rd. (Star of the Sea Church)\",\"Sandymount Green\",\"Sydney Parade Rail Station\",\"Nutley Lane (St. Vincent's Hospital)\",\"Stillorgan Rd. (Nutley Lane)\",\"Stillorgan Rd. (Woodbine Rd.)\",\"Stillorgan Rd. (Seafield Rd.)\",\"Stillorgan Rd. (Booterstown Ave.)\",\"Stillorgan Rd. (Mount Merrion Ave.)\",\"Stillorgan Rd. (Woodlands Ave.)\",\"Stillorgan Heath\",\"Sandyford Business District\",\"Murphystown Way\",\"Kilgobbin Rd.\",\"Stepaside (Smith's)\",\"Enniskerry Rd.\",\"Belarmine\"],\"in\":[\"Belarmine\",\"Enniskerry Rd.\",\"Stepaside (Smith's)\",\"Kilgobbin Rd.\",\"Murphystown Way\",\"Sandyford Business District\",\"Stillorgan Heath\",\"Stillorgan Rd. (Woodlands Ave.)\",\"Stillorgan Rd. (Mount Merrion Ave.)\",\"Stillorgan Rd. (Booterstown Ave.)\",\"Stillorgan Rd. (Seafield Rd.)\",\"Stillorgan Rd. (Woodbine Rd.)\",\"Stillorgan Rd. (Nutley Lane)\",\"Nutley Lane (St. Vincent's Hospital)\",\"Sydney Parade Rail Station\",\"Sandymount Green\",\"Sandymount Rd. (Star of the Sea Church)\",\"Irishtown Rd. (Tritonville Rd.)\",\"Ringsend (Thorncastle St.)\",\"Pearse St. (Macken St.)\",\"Poolbeg St.\"]},\"74\":{\"termini\":[\"Eden Quay\",\"Dundrum Luas\"],\"out\":[\"Eden Quay\",\"Burgh Quay\",\"Wellington Quay\",\"Winetavern Street\",\"Nicholas Street\",\"St Luke's Avenue\",\"Cork Street\",\"Dolphin's Barn Street\",\"Dolphin's Barn\",\"Crumlin Road\",\"Sundrive Road\",\"Clogher Road\",\"Kildare Road\",\"Clonmacnoise Road\",\"Armagh Road\",\"Cashel Road\",\"Ravensdale Park\",\"Kimmage Road Lower\",\"Terenure Road West\",\"Rathfarnham Road\",\"Willbrook Road\",\"Ballyboden Road\",\"Taylors Lane\",\"Whitechurch Green\",\"Whitechurch Road\",\"Grange Road\",\"Brehon Field Road\",\"Ballinteer Road\",\"Wyckham Way\",\"Sandyford Road\",\"Main Street (Dundrum Luas)\"],\"in\":[\"Main Street (Dundrum Luas)\",\"Dundrum Bypass\",\"Wyckham Way\",\"Ballinteer Road\",\"Brehon Field Road\",\"Grange Road\",\"Whitechurch Road\",\"Whitechurch Green\",\"Taylors Lane\",\"Ballyboden Road\",\"Willbrook Road\",\"Rathfarnham Road\",\"Terenure Road West\",\"Kimmage Road Lower\",\"Ravensdale Park\",\"Cashel Road\",\"Clonmacnoise Road\",\"Sundrive Road\",\"Crumlin Road\",\"Dolphin's Barn Street\",\"Cork Street\",\"St Luke's Avenue\",\"Patrick Street\",\"Nicholas Street\",\"Ormond Quay Upper\",\"Bachelors Walk\",\"Townsend Street\",\"Eden Quay\"]},\"E1\":{\"termini\":[\"Northwood\",\"Ballywaltrim (Southern Cross)\"],\"out\":[\"Northwood\",\"Ballymun Road (Santry Avenue)\",\"Nursing Home\",\"Ballymun Road (Civic Centre)\",\"Ballymun Road (Comprehensive School)\",\"Ballymun Road (Shanliss Road)\",\"Ballymun Road (Albert College Drive)\",\"Ballymun Road (DCU)\",\"Ballymun Road (Hampstead Avenue)\",\"Ballymun Road (The Rise)\",\"Griffith Avenue\",\"Mobhi Road (Home Farm Road)\",\"Mobhi Road (Na Fianna)\",\"Mobhi Road (Dean Swift Bridge)\",\"Botanic Rd (Cliftonville Road)\",\"Botanic Rd (Marguerite Road)\",\"Prospect Road (Botanic Road)\",\"Phibsboro Road (Royse Road)\",\"Phibsboro Road (North Circular Road)\",\"Phibsboro Road (Broadstone)\",\"Phibsboro Road (Broadstone Depot)\",\"Western Way (Youth Club)\",\"Blessington Street (Blessington Court)\",\"Parnell Square (Colaiste Mhuire)\",\"O'Connell Street Upper\",\"O'Connell Street (North Earl Street)\",\"D'Olier Street (Burgh Quay)\",\"Nassau Street\",\"Kildare Street (Archbishop Statue)\",\"St. Stephen's Green East\",\"Leeson Street (St. Stephen's Green)\",\"Leeson Street (Fitzwilliam Place)\",\"Leeson Street (Mespil Road)\",\"Sussex Road (Burlington Road)\",\"Leeson Street (Appian Way)\",\"Morehampton Road (Royal Hospital)\",\"Morehampton Road (Brendan Road)\",\"Morehampton Road (Victoria Avenue)\",\"Donnybrook (Rugby Ground)\",\"Stillorgan Road (Bus Garage)\",\"Stillorgan Road (Donnybrook Close)\",\"Stillorgan Road (RTE)\",\"Stillorgan Road (Belfield Court)\",\"Stillorgan Road (UCD)\",\"Stillorgan Road (Seafield Road)\",\"Stillorgan Road (Fosters Avenue)\",\"Stillorgan Road (Booterstown Avenue)\",\"Stillorgan Road (Mount Merrion Avenue)\",\"Priory Grove\",\"Stillorgan Park\",\"Stillorgan Road (St. John of God's)\",\"Stillorgan Road (Beechwood Court)\",\"Stillorgan Road (Galloping Green)\",\"Newtownpark Avenue\",\"Knocksinna\",\"Foxrock Church\",\"Bray Road (Westminster Road)\",\"Old Bray Road\",\"Cabinteely Bypass (Clonkeen Road)\",\"Bray Road (Johnstown Road)\",\"Bray Road (Kilbogget Park)\",\"Bray Road (Shanganagh Vale)\",\"Bray Road (Garrison Mews)\",\"Wyattville Road\",\"Bray Road (Loughlinstown Hospital)\",\"Bray Road (Cossfoot)\",\"Bray Road (St. Anne's Church)\",\"Bray Road (Quinn's Road)\",\"Bray Road (Claremount)\",\"Bray Road (Shanganagh Castle)\",\"Bray Road (Shanganagh Cemetery)\",\"Bray Road (Crinken Church)\",\"Bray Road (Woodbrook)\",\"Bray Road (Old Connacht Avenue)\",\"Saint Peter's Church\",\"Castle Street (Dargle Road)\",\"Castle Street (Dwyer Park)\",\"Bray Main Street (Quinsborough Road)\",\"Bray Main Street (St Kevin's Square)\",\"Killarney Road (Vevay Road)\",\"Killarney Road (Rosslyn)\",\"Killarney Road (The Nurseries)\",\"Fairyhill\",\"Richmond Way\",\"Killarney Road (St. Fergal's Church)\",\"Killarney Road (Ballywaltrim Heights)\",\"Killarney Road (Cemetery)\",\"Southern Cross (Ballywaltrim)\"],\"in\":[\"Southern Cross (Ballywaltrim)\",\"Killarney Road (Cemetery)\",\"Killarney Road (Ballywaltrim Heights)\",\"Killarney Road (St. Fergal's Church)\",\"Richmond Way\",\"Fairyhill\",\"Killarney Road (The Nurseries)\",\"Killarney Road (Rosslyn)\",\"Killarney Road (Vevay Road)\",\"Bray Main Street (St Kevin's Square)\",\"Bray Main Street (Quinsborough Road)\",\"Castle Street (Dwyer Park)\",\"Castle Street (Dargle Road)\",\"Saint Peter's Church\",\"Bray Road (Old Connacht Avenue)\",\"Bray Road (Woodbrook)\",\"Bray Road (Crinken Church)\",\"Bray Road (Shanganagh Cemetery)\",\"Bray Road (Shanganagh Castle)\",\"Bray Road (Claremount)\",\"Bray Road (Quinn's Road)\",\"Bray Road (St. Anne's Church)\",\"Bray Road (Cossfoot)\",\"Bray Road (Loughlinstown Hospital)\",\"Wyattville Road\",\"Bray Road (Garrison Mews)\",\"Bray Road (Shanganagh Vale)\",\"Bray Road (Kilbogget Park)\",\"Bray Road (Johnstown Road)\",\"Cabinteely Bypass (Clonkeen Road)\",\"Old Bray Road\",\"Bray Road (Westminster Road)\",\"Foxrock Church\",\"Knocksinna\",\"Newtownpark Avenue\",\"Stillorgan Road (Galloping Green)\",\"Stillorgan Road (Beechwood Court)\",\"Stillorgan Road (St. John of God's)\",\"Stillorgan Park\",\"Priory Grove\",\"Stillorgan Road (Mount Merrion Avenue)\",\"Stillorgan Road (Booterstown Avenue)\",\"Stillorgan Road (Fosters Avenue)\",\"Stillorgan Road (Seafield Road)\",\"Stillorgan Road (UCD)\",\"Stillorgan Road (Belfield Court)\",\"Stillorgan Road (RTE)\",\"Stillorgan Road (Donnybrook Close)\",\"Stillorgan Road (Bus Garage)\",\"Donnybrook (Rugby Ground)\",\"Morehampton Road (Victoria Avenue)\",\"Morehampton Road (Brendan Road)\",\"Morehampton Road (Royal Hospital)\",\"Leeson Street (Appian Way)\",\"Sussex Road (Burlington Road)\",\"Leeson Street (Mespil Road)\",\"Leeson Street (Fitzwilliam Place)\",\"Leeson Street (St. Stephen's Green)\",\"St. Stephen's Green East\",\"Kildare Street (Archbishop Statue)\",\"Nassau Street\",\"D'Olier Street (Burgh Quay)\",\"O'Connell Street (North Earl Street)\",\"O'Connell Street Upper\",\"Parnell Square (Colaiste Mhuire)\",\"Blessington Street (Blessington Court)\",\"Western Way (Youth Club)\",\"Phibsboro Road (Broadstone Depot)\",\"Phibsboro Road (Broadstone)\",\"Phibsboro Road (North Circular Road)\",\"Phibsboro Road (Royse Road)\",\"Prospect Road (Botanic Road)\",\"Botanic Rd (Marguerite Road)\",\"Botanic Rd (Cliftonville Road)\",\"Mobhi Road (Dean Swift Bridge)\",\"Mobhi Road (Na Fianna)\",\"Mobhi Road (Home Farm Road)\",\"Griffith Avenue\",\"Ballymun Road (The Rise)\",\"Ballymun Road (Hampstead Avenue)\",\"Ballymun Road (DCU)\",\"Ballymun Road (Albert College Drive)\",\"Ballymun Road (Shanliss Road)\",\"Ballymun Road (Comprehensive School)\",\"Ballymun Road (Civic Centre)\",\"Nursing Home\",\"Ballymun Road (Santry Avenue)\",\"Northwood\"]},\"L25\":{\"termini\":[\"D\u00fan Laoghaire Station\",\"Dundrum (Town Centre)\"],\"out\":[\"D\u00fan Laoghaire Station\",\"Dun Laoghaire Shopping Centre\",\"St Michael's Hospital\",\"Smith's Villas\",\"Vessey Place\",\"Knapton Court\",\"York Road (Mounttown Upper)\",\"Bluepool Pitches\",\"Stradbrook Road\",\"Grange Grove\",\"Rowanbyrn\",\"Carysfort Avenue\",\"Stillorgan Park\",\"Patrician Villas\",\"Stillorgan Village\",\"Kilmacud Road\",\"Kilmacud Road Lower\",\"Kilmacud Park\",\"Kilmacud House\",\"Marsham Court\",\"Kilmacud Avenue\",\"Lakelands Lawn\",\"Sweet Briar Lane\",\"Eden Park Avenue\",\"Knocknashee\",\"Birches Lane\",\"Balally Luas\",\"Dundrum Town Centre\",\"Holy Cross Church\",\"Main Street (Dundrum Luas)\"],\"in\":[\"Dundrum Town Centre\",\"Overend Way\",\"Knocknashee\",\"Eden Park Avenue\",\"Hazel Villas\",\"Lakelands Lawn\",\"Kilmacud Avenue\",\"Marsham Court\",\"Whately Place\",\"Kilmacud Park\",\"Kilmacud Road Lower\",\"Stillorgan SC\",\"Stillorgan Park\",\"Fleurville Road\",\"Rowanbyrn\",\"Link Road (Deansgrange Road)\",\"Monkstown Ave (Stradbrook Rd)\",\"Monkstown Ave (Richmond Grove)\",\"Kendal House\",\"Knapton Court\",\"Vessey Place\",\"Crofton Road\",\"Crofton Avenue\",\"D\u00fan Laoghaire Station\"]}},\"termini_only\":{\"X1\":[\"Kilcoole\",\"Hawkins Street\"],\"X2\":[\"Newcastle\",\"Hawkins Street\"],\"L12\":[\"Ballywaltrim (Southern Cross)\",\"Bray Dart Station\"],\"L14\":[\"Southern Cross Road\",\"Palermo\"],\"118\":[\"Kilternan Village\",\"Eden Quay\"]}}");
+const CE={'13':'1102','L25':'1143','L12':'1166','L14':'1166','4':'1168','14':'1168','44':'1168','74':'1168','E1':'1167','X1':'1167','X2':'1167','1126':'1167','118':'1167','11':'1122','11B':'1122','15':'1122','15B':'1122','47':'1122','7':'1122','7A':'1122','7B':'1122','7D':'1122'};
+function ctrl(rte){if(!rte)return null;const ex=new Set();rte.split('/').forEach(r=>{const e=CE[r.trim()];if(e)ex.add(e);});return ex.size?[...ex].map(e=>({p:'(01) 703 '+e,t:'+3531703'+e})):null;}
+const LN={'DBRK1PO':'Donnybrook Garage','DBRK2PO':'Donnybrook Garage','DBRK1PI':'Donnybrook Garage','DBRK2PI':'Donnybrook Garage','MONTSQ03':'Mountjoy Square','MONTSQ04':'Mountjoy Square','PBEGST02':'Poolbeg Street','PBEGST01':'Poolbeg Street','MJSQ':'Mountjoy Square','POOLBEG':'Poolbeg Street','BELMRN':'Belarmine','Dun Laogh St':'Dun Laoghaire St'};
+function ln(l){return LN[l]||(l||'').replace(/_/g,' ');}
+function norm(s){s=(s||'').toUpperCase().trim();if(s.includes('/'))s=s.split('/').pop();s=s.replace(/[^0-9A-Z]/g,'');const m=s.match(/^0*([0-9]*)([A-Z]*)$/);return m?(m[1].replace(/^0+/,'')+m[2]):s;}
+function sm(t){if(!t||!t.includes(':'))return 0;const[a,b]=t.split(':');return+a*60+ +b;}
+// Day-aware minutes: for overnight duties, any clock time that's more than 60min
+// "before" the duty's depart-time anchor is actually past midnight (next day) --
+// without this, sorting overnight stops by raw sm() puts post-midnight times
+// (00:11, 02:15...) BEFORE the evening times (20:45, 21:50...) that precede them.
+function smd(t,anchor){const v=sm(t);return(anchor!=null&&v<anchor-60)?v+1440:v;}
+function ov(d){const r=sm(d.report),f=sm(d.sign_off);return r>0&&f>0&&f<r;}
+let day='Mon-Fri';
+document.querySelectorAll('.dtab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.dtab').forEach(x=>x.classList.remove('on'));b.classList.add('on');day=b.dataset.day;});
+document.getElementById('duty-q').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+document.getElementById('vcnt').textContent='Live duty data \u2022 connected to database';
+document.getElementById('upd-search').textContent='Live database';
+document.getElementById('upd-route').textContent='Live database';
+function goWelcome(){document.getElementById('welcome').classList.remove('hidden');document.getElementById('search').classList.add('hidden');document.getElementById('res').innerHTML='';document.getElementById('duty-q').value='';}
+function goSearch(){document.getElementById('welcome').classList.add('hidden');document.getElementById('search').classList.remove('hidden');setTimeout(()=>document.getElementById('duty-q').focus(),200);}
+async function doSearch(){
+ const raw=document.getElementById('duty-q').value.trim();if(!raw)return;
+ const upper=raw.toUpperCase().replace(/\s+/g,'');
+ const hasSlash=upper.includes('/');
+ const el=document.getElementById('res');
+ el.innerHTML='<div class="nores">Searching&hellip;</div>';
+ try{
+  if(hasSlash){
+   const res=await fetch(`/api/duty?roster=${encodeURIComponent(upper)}&day=${encodeURIComponent(day)}`);
+   if(res.status===404){showNoResults(raw);return;}
+   if(!res.ok){el.innerHTML='<div class="nores">Something went wrong. Try again.</div>';return;}
+   const d=await res.json();
+   d.route=d.stops||[];
+   d.routeNo=d.route_no||'';
+   el.innerHTML=card({d,g:d.garage_group,z:d.zone});
+   return;
+  }
+  const res=await fetch(`/api/duty?q=${encodeURIComponent(raw)}&day=${encodeURIComponent(day)}`);
+  if(!res.ok){el.innerHTML='<div class="nores">Something went wrong. Try again.</div>';return;}
+  const rows=await res.json();
+  if(!rows.length){showNoResults(raw);return;}
+  if(rows.length===1){
+   const full=await fetchFull(rows[0].roster);
+   if(full)el.innerHTML=card({d:full,g:full.garage_group,z:full.zone});
+   else showNoResults(raw);
+   return;
+  }
+  window._m=rows;
+  el.innerHTML=`<div class="sbody" style="padding-top:4px"><div class="sect-lbl">Select your duty</div></div><div class="mlist" style="padding:0 16px">${rows.map((r,i)=>`<div class="mitem" onclick="pick(${i})"><span class="mnum">${norm(r.roster)}</span><div class="minfo"><div class="mtimes">${r.report||'--'} &rarr; ${r.sign_off||'--'}</div><div class="mzone">${r.zone} &bull; Rte ${r.route_no||'?'}</div></div><span class="marr">&rsaquo;</span></div>`).join('')}</div>`;
+ }catch(e){
+  el.innerHTML='<div class="nores">Network error. Check your connection and try again.</div>';
+ }
+}
+function showNoResults(raw){
+ document.getElementById('res').innerHTML=`<div class="nores">No duty found for <strong>${raw}</strong><br>on ${day}.<br><br>Check the number and try again.</div>`;
+}
+async function fetchFull(roster){
+ const res=await fetch(`/api/duty?roster=${encodeURIComponent(roster)}&day=${encodeURIComponent(day)}`);
+ if(!res.ok)return null;
+ const d=await res.json();
+ // card() expects d.route (stops array) and d.routeNo, matching the field
+ // names from the original embedded-JSON build; the DB uses stops/route_no.
+ d.route=d.stops||[];
+ d.routeNo=d.route_no||'';
+ return d;
+}
+window.pick=async i=>{
+ const r=window._m[i];
+ const el=document.getElementById('res');
+ el.innerHTML='<div class="nores">Loading&hellip;</div>';
+ const full=await fetchFull(r.roster);
+ if(full)el.innerHTML=card({d:full,g:full.garage_group,z:full.zone});
+};
+const _PAL=['#F9BE00','#4CAF50','#00A5DF','#FF8C00','#E91E8C','#9B59B6','#00BCD4','#8BC34A','#FF5722','#2196F3','#AB47BC','#26C6DA','#EF5350','#009688','#FF7043'];
+function scl(n){if(!n)return'#8ba3c9';let h=0;for(let i=0;i<n.length;i++)h=((h<<5)-h+n.charCodeAt(i))|0;return _PAL[Math.abs(h)%_PAL.length];}
+// Zone 1: determine route for a stop by scanning for next city terminus
+function dz1Route(stops,idx){
+ const r15=['clongriffin','ballycullen','eden quay','hawkins'];
+ const r4=['monkstown','heuston','aston','bachelors'];
+ const here=(stops[idx][0]||'').toLowerCase();
+ if(r4.some(h=>here.includes(h)))return'4';
+ for(let j=idx+1;j<stops.length;j++){
+  const n=(stops[j][0]||'').toLowerCase();
+  if(n.includes('psqe'))return'11';
+  if(n.includes('psqw'))return'11B';
+  if(r15.some(h=>n.includes(h)))return'15';
+  if(r4.some(h=>n.includes(h)))return'4';
+ }
+ for(let j=idx-1;j>=0;j--){
+  const n=(stops[j][0]||'').toLowerCase();
+  if(n.includes('psqe'))return'11';
+  if(n.includes('psqw'))return'11B';
+  if(r15.some(h=>n.includes(h)))return'15';
+  if(r4.some(h=>n.includes(h)))return'4';
+ }
+ return'';
+}
+function stopSpecial(name,lab){
+  const n=(name||'').toLowerCase();
+  if(lab==='Break'||lab==='Resume')return'#009A44';
+  if(lab==='SPCL')return'#F9BE00';
+  if(lab==='END')return'#F9BE00';
+  // Named stop overrides
+  if(n.includes('ballywaltrim'))return'#00A5DF';
+  if(n.includes('northwood'))return'#e84040';
+  // DZ1 stop colours
+  if(n.includes('ballycullen'))return'#FF8C00';
+  if(n.includes('clongriffin'))return'#9B59B6';
+  if(n.includes('infirmary'))return'#26C6DA';
+  if(n.includes('eglinton'))return'#AB47BC';
+  // DZ5 stop colours
+  if(n.includes('mountjoy'))return'#00A5DF';
+  if(n.includes('loughlinstown'))return'#e84040';
+  if(n.includes('brides glen'))return'#009A44';
+  if(n.includes('shankill'))return'#e84040';
+  if(n.includes('dalkey'))return'#009A44';
+  return null;
+}
+function fallback(d){const fb=[];if(d.depart)fb.push([ln(d.start_loc)||'Garage',d.depart]);if(d.break_start){fb.push([ln(d.break_loc)||'',d.break_start]);const bt=d.period2_start||d.period2_report;if(bt)fb.push([ln(d.period2_loc)||'',bt]);}return fb;}
+function termColour(name){
+  const n=(name||'').toLowerCase();
+  if(n.includes('mountjoy'))return'tc-mountjoy';
+  if(n.includes('bride')||n.includes('brides'))return'tc-bridesglen';
+  if(n.includes('loughlinstown'))return'tc-loughlinstown';
+  if(n.includes('poolbeg'))return'tc-poolbeg';
+  if(n.includes('belarmine')||n.includes('belermine'))return'tc-belarmine';
+  if(n.includes('dundrum'))return'tc-dundrum';
+  if(n.includes('laoghaire')||n.includes('dun laoghaire'))return'tc-dun-laoghaire';
+  return'';
+}
+function shiftType(d,z){
+  const dep=d.depart||'';if(!dep||!dep.includes(':'))return'';
+  const[h,m]=dep.split(':').map(Number);const depM=h*60+m;
+  function mins(t){if(!t||!t.includes(':'))return null;const[a,b]=t.split(':').map(Number);return a*60+b;}
+  const bs=mins(d.break_start),ps=mins(d.period2_start);
+  if(bs!==null&&ps!==null){let brk=ps-bs;if(brk<0)brk+=1440;if(brk>=180&&depM<11*60)return'BOGEY';}
+  if(depM>=19*60||depM<4*60)return'NIGHT';
+  if(depM>=14*60)return'LATE';
+  if(depM>=10*60)return'RELIEF';
+  // EARLY with NO break in Zone 1/2/4/5 = a straight early "workout" duty
+  const _ZONES_WO=['Zone 1','Zone 2','Zone 4','Zone 5'];
+  if(!d.break_start&&_ZONES_WO.includes(z))return'EARLY_WO';
+  return'EARLY';
+}
+function card({d,g,z}){
+ const rte=d.routeNo||'';
+ const stops=(d.route&&d.route.length)?d.route.map(s=>[ln(s[0])||s[0],s[1]]):fallback(d);
+ const n=stops.length;
+ // --- Merge board stops with duty-sheet key points ---
+ // Remove board stops that hit break time but whose name doesn't match break_loc
+ // (driver went special through those stops on the way back to garage)
+ const bsm=d.break_start?sm(d.break_start):null;
+ const prm=(d.period2_start||d.period2_report)?sm(d.period2_start||d.period2_report):null;
+ const bloc=(ln(d.break_loc)||d.break_loc||'').toLowerCase().split(' ')[0];
+ const ploc=(d.period2_loc||'').toLowerCase().split(' ')[0];
+ const _toGarage0=s2=>(s2||'').includes('garage')||(s2||'').includes('dbrk1po')||(s2||'').includes('dbrk2po');
+ const _breakIsGarage=_toGarage0((ln(d.break_loc)||d.break_loc||'').toLowerCase());
+ let merged=stops.filter(s=>{
+  const t=sm(s[1]),nm=(s[0]||'').toLowerCase();
+  // Only drop a near-break stop if the break is at the Garage AND this stop isn't Garage
+  // (i.e. the driver went special/dead to garage past this point).
+  // If break_loc is a normal route terminus (e.g. PSQE), keep all stops.
+  if(bsm!==null&&_breakIsGarage&&Math.abs(t-bsm)<=15&&bloc&&!nm.includes(bloc))return false;
+  return true;
+ });
+ // Inject start from duty sheet if board trace begins later than depart
+ if(d.depart&&merged.length&&sm(merged[0][1])>sm(d.depart)+2){
+  merged.unshift([ln(d.start_loc)||d.start_loc||'Garage',d.depart]);
+ }
+ // Inject break/resume from duty sheet if not already present
+ // DZ4: remove stops not needed by drivers
+ if(z==='Zone 4'){
+  const dz4Drop=['ballymun rd','parnell sq east','foxrock church'];
+  merged=merged.filter(s=>!dz4Drop.some(h=>(s[0]||'').toLowerCase().includes(h)));
+ }
+ const hasBreak=merged.some(s=>bsm!==null&&Math.abs(sm(s[1])-bsm)<=10);
+ const hasResume=merged.some(s=>prm!==null&&Math.abs(sm(s[1])-prm)<=10);
+ if(d.break_start&&!hasBreak)merged.push([ln(d.break_loc)||d.break_loc||'Garage',d.break_start]);
+ if((d.period2_start||d.period2_report)&&!hasResume)merged.push([ln(d.period2_loc)||d.period2_loc||'',d.period2_start||d.period2_report]);
+ const _anchorM=d.depart?sm(d.depart):null;
+ merged.sort((a,b)=>smd(a[1],_anchorM)-smd(b[1],_anchorM));
+ // Inject END entry from duty sheet finish/sign-off
+ if(d.sign_off){
+  const endNm=ln(d.finish_loc)||d.finish_loc||'Garage';
+  const endT=d.sign_off;
+  const last=merged[merged.length-1];
+  const alreadyThere=last&&last[1]===endT&&(last[0]||'').toLowerCase().includes((endNm||'').toLowerCase().split(' ')[0]);
+  if(!alreadyThere)merged.push([endNm,endT,'__END__']);
+ }
+ // Remove "g" (garage departure) point: if last board stop time = sign_off it's a dead-run waypoint
+ if(d.sign_off&&d.finish_loc){
+  const fl2=(ln(d.finish_loc)||d.finish_loc||'').toLowerCase();
+  if(fl2.includes('garage')||fl2.includes('dbrk')){
+   // Find last non-END index
+   let li=-1;
+   for(let i=merged.length-1;i>=0;i--){if(merged[i][2]!=='__END__'){li=i;break;}}
+   if(li>=0){
+    const lnm=(merged[li][0]||'').toLowerCase();
+    const lt=sm(merged[li][1]);
+    const so=sm(d.sign_off);
+    // If same time as sign_off and not already garage → it's a "g" through-point, remove it
+    if(!lnm.includes('garage')&&!lnm.includes('dbrk')&&Math.abs(lt-so)<=2)
+     merged.splice(li,1);
+   }
+  }
+ }
+ const mn=merged.length;
+ const toGarage=s2=>(s2||'').includes('garage')||(s2||'').includes('dbrk1po')||(s2||'').includes('dbrk2po');
+ // Mark SPCL: last board stop before break — only when break_loc is Garage (dead run)
+ const spclSet=new Set();
+ const _blIsGarage=toGarage((ln(d.break_loc)||d.break_loc||'').toLowerCase());
+ const _startIsGarage=toGarage((ln(d.start_loc)||d.start_loc||'').toLowerCase());
+ if(bsm!==null&&bloc&&_blIsGarage&&_startIsGarage){
+  for(let i=mn-1;i>=0;i--){
+   const t=sm(merged[i][1]),nm=(merged[i][0]||'').toLowerCase();
+   if(merged[i][2]==='__END__')continue;
+   if(t<bsm-1&&!nm.includes(bloc)){spclSet.add(i);break;}
+  }
+ }
+ // Mark last board stop as SPCL when finish is at garage — only if the LAST RUN started from Garage
+ // (BOGEY: period2_loc=Garage; straight: start_loc=Garage)
+ if(d.finish_loc&&d.sign_off){
+  const fl3=(ln(d.finish_loc)||d.finish_loc||'').toLowerCase();
+  const _lastRunFromGarage=d.break_start
+   ?toGarage((ln(d.period2_loc)||d.period2_loc||'').toLowerCase())
+   :_startIsGarage;
+  if((fl3.includes('garage')||fl3.includes('dbrk'))&&_lastRunFromGarage){
+   for(let i=mn-1;i>=0;i--){
+    if(merged[i][2]==='__END__')continue;
+    const nm3=(merged[i][0]||'').toLowerCase();
+    if(!nm3.includes('garage')&&!nm3.includes('dbrk')){spclSet.add(i);break;}
+   }
+  }
+ }
+ // DZ4: Ballywaltrim/Northwood → SPCL only when destination is Garage
+ if(z==='Zone 4'){
+  const dz4T=['ballywaltrim','northwood'];
+  const fl4=(ln(d.finish_loc)||d.finish_loc||'').toLowerCase();
+  const bl4=(ln(d.break_loc)||d.break_loc||'').toLowerCase();
+  // End-of-duty at Garage → last Ballywaltrim/Northwood before END gets SPCL
+  if(toGarage(fl4)){
+   for(let i=mn-1;i>=0;i--){
+    if(merged[i][2]==='__END__')continue;
+    const nm=(merged[i][0]||'').toLowerCase();
+    if(dz4T.some(h=>nm.includes(h))){spclSet.add(i);}
+    break;
+   }
+  }
+  // Break at Garage → last Ballywaltrim/Northwood before break gets SPCL
+  if(bsm!==null&&toGarage(bl4)){
+   for(let i=mn-1;i>=0;i--){
+    if(merged[i][2]==='__END__')continue;
+    const t=sm(merged[i][1]),nm=(merged[i][0]||'').toLowerCase();
+    if(t<bsm){
+     if(dz4T.some(h=>nm.includes(h))){spclSet.add(i);}
+     break;
+    }
+   }
+  }
+ }
+ const tpsData=[];
+ // Build rows as an ARRAY (not a joined string) so handover rows can be
+ // spliced in at exact index positions -- robust against any future markup
+ // changes (e.g. terminus-colour classes), unlike fragile string-searching.
+ let breakRowIdx=-1, resumeRowIdx=-1;
+ const tpRows=merged.map((s,i)=>{
+  let lab='';
+  if(i===0)lab='Start';
+  else if(i===mn-1&&!spclSet.has(i)&&s[2]!=='__END__')lab='Terminus';
+  if(s[2]==='__END__'){lab='END';}
+  else if(bsm!==null&&Math.abs(sm(s[1])-bsm)<=10)lab='Break';
+  else if(prm!==null&&Math.abs(sm(s[1])-prm)<=10)lab='Resume';
+  else if(spclSet.has(i))lab='SPCL';
+  if(lab==='Break')breakRowIdx=i;
+  if(lab==='Resume')resumeRowIdx=i;
+  // Special stops always get their colour; keyed (Start/Terminus) get hash; others white
+  const isKeyed=lab!=='';
+  const special=stopSpecial(s[0],lab);
+  const c=special?special:(isKeyed?scl(s[0]):'#ffffff');
+  const sty=(special||isKeyed)?`background:${c}22;box-shadow:inset 4px 0 0 ${c}`:`background:rgba(255,255,255,.04)`;
+  const rteTag=(z==='Zone 1'&&special&&!isKeyed)?dz1Route(merged,i):'';
+  tpsData.push([s[1],s[0]+(rteTag?` (${rteTag})`:''),lab]);
+  const _tc=termColour(s[0]);
+  return `<div class="tpr ${_tc}" style="${sty}"><span class="tpt" style="color:${c}">${s[1]}</span><span class="tpn" style="color:${c}">${s[0]}${rteTag?`<span class="tp-rte" style="color:${c}">${rteTag}</span>`:''}${lab?`<span class="tpl">${lab}</span>`:''}</span></div>`;
+ });
+ // ── Handover arrows ──────────────────────────────────────────────────────
+ const hw=d.handovers||[];
+ const tb=(d.roster||'').split('/').pop(); // board number e.g. "43" or "14X"
+ function hdoRow(fr,ti,cls){
+   const arr='<span class="hdo-sep">&#8594;</span>';
+   return `<div class="hdo ${cls}">${fr}${arr}${ti}</div>`;
+ }
+ let hdoPre='',hdoMidOut='',hdoMidIn='',hdoPost='';
+ if(hw.length>0){
+   const r1=hw[0];
+   const r2=hw.length>1?hw[1]:null;
+   if(r1.from)hdoPre=hdoRow(r1.from,tb,'hdo-in');
+   if(r2){
+     if(r1.to)hdoMidOut=hdoRow(tb,r1.to,'hdo-out');
+     if(r2.from)hdoMidIn=hdoRow(r2.from,tb,'hdo-in');
+   }
+   const rLast=r2||r1;
+   if(rLast.to)hdoPost=hdoRow(tb,rLast.to,'hdo-out');
+ }
+ // Splice handover rows into the array at the exact Break/Resume positions,
+ // working from the END of the array first so earlier indices stay valid.
+ if(resumeRowIdx>-1&&hdoMidIn)tpRows.splice(resumeRowIdx,0,hdoMidIn);
+ if(breakRowIdx>-1&&hdoMidOut)tpRows.splice(breakRowIdx+1,0,hdoMidOut);
+ let tps=(hdoPre?hdoPre:'')+tpRows.join('')+(hdoPost?hdoPost:'');
+ const cs=ctrl(rte);
+ const cHtml=cs?`<div class="cbox"><div class="ct">&#128222; Controller</div>${cs.map(c=>`<a class="clink" href="tel:${c.t}"><div class="cico">&#128222;</div><div><div class="cnum">${c.p}</div><div class="crte">Route ${rte} Controller</div></div></a>`).join('')}</div>`:'';
+ const ovTag=ov(d)?`<sup style="color:var(--amb);font-size:11px">+1</sup>`:'';
+ window._curCard={roster:d.roster,rte:rte||'',on:d.report||'',off:d.sign_off||'',tag:d.break_start?'Split':'Straight',shift:(shiftType(d,z)==='EARLY_WO'?'Early & Workout':shiftType(d,z)),tm:(d.duty||'').replace(/\D/g,'').slice(-3).padStart(3,'0'),worked:d.work||'',brk:d.relief||'',total:d.spread||'',rows:tpsData};
+ return `<div class="card"><div class="card-hdr">${rte?`<div class="c-rte" onclick="openRouteView('${rte.replace(/'/g,"\\'")}')">Route ${rte} &rsaquo;</div>`:''}
+  <button class="btn-dl" onclick="downloadDutyXLSX()" title="Download CSV file">&#128190; Save &mdash; Download file</button>
+  <div class="c-num">${norm(d.roster)}</div>
+  <div class="c-date">&#128197; ${(()=>{const n=new Date();return String(n.getDate()).padStart(2,'0')+'/'+String(n.getMonth()+1).padStart(2,'0')+'/'+n.getFullYear();})()}</div>
+  <div class="c-tm"><span class="tm-ico">&#127915;</span>Ticket Machine <b>${(d.duty||'').replace(/\D/g,'').slice(-3).padStart(3,'0')}</b></div>
+  <div class="c-times"><div><span class="c-lbl">On</span>${d.report||'--'}</div><span class="c-arr">&rarr;</span><div><span class="c-lbl">Off</span>${d.sign_off||'--'}${ovTag}</div>${(()=>{const st=shiftType(d,z);const stLabel=st==='EARLY_WO'?'Early & Workout':st;return st?`<span class="stype st-${st}">${stLabel}</span>`:''})()}</div>
+ </div>
+ <div class="sec-t">Timing points</div><div class="tplist">${tps}</div>
+ <div class="sec-t">Hours</div>
+ <div class="hrs"><div class="hbox w"><div class="hk">Worked</div><div class="hv">${d.work||'--'}</div></div><div class="hbox b"><div class="hk">Break</div><div class="hv">${d.relief||'--'}</div></div><div class="hbox"><div class="hk">Total</div><div class="hv">${d.spread||'--'}</div></div></div>
+ ${cHtml}
+ <button class="btn-again" onclick="document.getElementById('res').innerHTML='';document.getElementById('duty-q').focus()">&larr; Search Another Duty</button>
+ <div style="text-align:center;padding-bottom:12px;font-family:var(--mono);font-size:11px;color:var(--fnt)">${d.roster} &bull; ${z} &bull; ${g}</div>
+ </div>`;
+}
+
+async function downloadDutyXLSX(){
+  const c=window._curCard;
+  if(!c){alert('Open a duty card first, then tap Save.');return;}
+  const rows=[
+    ['Roster',c.roster||''],['Route',c.rte||''],
+    ['Ticket Machine',c.tm||''],['On',c.on||''],
+    ['Off',c.off||''],['Type',c.tag||''],['Shift',c.shift||''],
+    [],['Time','Stop','Note'],
+    ...(c.rows||[])
+  ];
+  rows.push([],['Worked',c.worked||''],['Break',c.brk||''],['Total',c.total||'']);
+  const esc=v=>{v=String(v==null?'':v);return/[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const csv='\ufeff'+rows.map(r=>r.map(esc).join(',')).join('\r\n');
+  const fname=(c.roster||'duty').replace(/[\\/]/g,'_')+(c.rte?'_'+c.rte.replace(/\//g,'-'):'')+'.csv';
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  // Strategy 1: Web Share API — iOS 15+ opens native Share Sheet (Save to Files, AirDrop, etc.)
+  try{
+    const file=new File([blob],fname,{type:'text/csv'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:fname});
+      return;
+    }
+  }catch(e){if(e.name==='AbortError')return;}
+  // Strategy 2: <a download> — works on desktop Chrome/Firefox/Edge
+  try{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=fname;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},200);
+    return;
+  }catch(e){}
+  // Strategy 3: Clipboard fallback — paste into Notes/Sheets manually
+  try{
+    await navigator.clipboard.writeText(csv);
+    alert('Copied to clipboard!\nPaste into Notes or Google Sheets.');
+  }catch(e){
+    alert('Save not supported on this browser.\nTry opening in Safari or Chrome.');
+  }
+}
+
+// ---- ROUTE VIEW ----
+let _rvDir='out';
+function gmaps(name){
+  const q=encodeURIComponent(name.replace(/\(.*?\)/g,'').trim()+', Dublin, Ireland');
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+function openRouteView(rteStr){
+  // rteStr may be "11/11B" or "E1" etc - take the first code
+  const codes=rteStr.split('/').map(s=>s.trim()).filter(Boolean);
+  // Prefer a code that has full data, else first termini-only, else first code
+  let code=codes.find(c=>ROUTE_STOPS.full[c]) || codes.find(c=>ROUTE_STOPS.termini_only[c]) || codes[0];
+  _rvDir='out';
+  renderRouteView(code);
+  document.getElementById('search').classList.add('hidden');
+  document.getElementById('routeview').classList.remove('hidden');
+}
+function closeRouteView(){
+  document.getElementById('routeview').classList.add('hidden');
+  document.getElementById('search').classList.remove('hidden');
+}
+window.setRVDir=dir=>{_rvDir=dir;renderRouteView(window._rvCode);};
+function renderRouteView(code){
+  window._rvCode=code;
+  const full=ROUTE_STOPS.full[code];
+  const body=document.getElementById('rv-body');
+  if(full){
+    const [a,b]=full.termini;
+    const stops=_rvDir==='out'?full.out:full.in;
+    const fromTo=_rvDir==='out'?`${a} &rarr; ${b}`:`${b} &rarr; ${a}`;
+    body.innerHTML=`
+      <div class="rv-hdr"><div class="rv-rte">Route ${code}</div><div class="rv-termini">${fromTo}</div></div>
+      <div class="rv-dirtabs">
+        <button class="rv-dirtab ${_rvDir==='out'?'on':''}" onclick="setRVDir('out')">${a} &rarr; ${b}</button>
+        <button class="rv-dirtab ${_rvDir==='in'?'on':''}" onclick="setRVDir('in')">${b} &rarr; ${a}</button>
+      </div>
+      <div class="rv-list">${stops.map((s,i)=>`<a class="rv-stop" href="${gmaps(s)}" target="_blank" rel="noopener"><span class="rv-num">${i+1}</span><span class="rv-name">${s}</span><span class="rv-pin">&#128205;</span></a>`).join('')}</div>`;
+    return;
+  }
+  const t=ROUTE_STOPS.termini_only[code];
+  if(t){
+    const [a,b]=t;
+    body.innerHTML=`
+      <div class="rv-hdr"><div class="rv-rte">Route ${code}</div><div class="rv-termini">${a} &harr; ${b}</div></div>
+      <div class="rv-note">Full stop list not yet available for this route. Tap a terminus below to view it on the map.</div>
+      <div class="rv-list">
+        <a class="rv-stop" href="${gmaps(a)}" target="_blank" rel="noopener"><span class="rv-num">1</span><span class="rv-name">${a}</span><span class="rv-pin">&#128205;</span></a>
+        <a class="rv-stop" href="${gmaps(b)}" target="_blank" rel="noopener"><span class="rv-num">2</span><span class="rv-name">${b}</span><span class="rv-pin">&#128205;</span></a>
+      </div>`;
+    return;
+  }
+  body.innerHTML=`<div class="rv-note">No route data available for Route ${code}.</div>`;
+}
+
+</script>
+</body>
+</html>
