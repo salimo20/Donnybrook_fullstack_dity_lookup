@@ -2,8 +2,8 @@ import type { Context, Config } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
 function getClient() {
-  const url = Netlify.env.get("SUPABASE_URL");
-  const key = Netlify.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
   return createClient(url, key);
 }
@@ -73,10 +73,10 @@ export default async (req: Request, _context: Context) => {
   }
 
   if (req.method === "PUT") {
-    const expected = Netlify.env.get("ADMIN_PASSWORD");
+    const expected = process.env.ADMIN_PASSWORD;
     const supplied = req.headers.get("x-admin-password");
     if (!expected) {
-      return json({ error: "server_not_configured", message: "ADMIN_PASSWORD env var is not set." }, 500);
+      return json({ error: "server_not_configured", message: "ADMIN_PASSWORD not set." }, 500);
     }
     if (!supplied || supplied !== expected) {
       return json({ error: "unauthorized" }, 401);
@@ -115,4 +115,5 @@ export default async (req: Request, _context: Context) => {
 
 export const config: Config = {
   path: "/api/duty",
+};
 };
