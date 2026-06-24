@@ -125,23 +125,14 @@ async function doLogin(){
   const msg = document.getElementById('login-msg');
   msg.className = 'msg'; msg.textContent = '';
   if (!pw) { msg.className = 'msg err'; msg.textContent = 'Enter a password.'; return; }
-  try {
-    const res = await fetch('/api/auth-check', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ password: pw }),
-    });
-    const data = await res.json();
-    if (!data.ok) { msg.className = 'msg err'; msg.textContent = 'Incorrect password.'; return; }
-    adminPassword = pw;
-    sessionStorage.setItem('admin_pw', pw);
-    document.getElementById('login-panel').classList.add('hidden');
-    document.getElementById('app-content').classList.remove('hidden');
-  } catch (e) {
-    msg.className = 'msg err'; msg.textContent = 'Network error: ' + e.message;
-  }
+  // Password is verified server-side on every save (PUT returns 401 if wrong).
+  adminPassword = pw;
+  sessionStorage.setItem('admin_pw', pw);
+  document.getElementById('login-panel').classList.add('hidden');
+  document.getElementById('app-content').classList.remove('hidden');
 }
 
+// Restore session within this browser tab so a refresh doesn't force re-login
 (function restoreSession(){
   const saved = sessionStorage.getItem('admin_pw');
   if (saved) {
@@ -155,18 +146,24 @@ document.getElementById('login-pw').addEventListener('keypress', e=>{
   if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
 });
 
+
 async function loadDuty(){
   const roster = document.getElementById('q-roster').value.trim();
   const day = document.getElementById('q-day').value;
   const msg = document.getElementById('search-msg');
   msg.className = 'msg'; msg.textContent='';
   if(!roster){ msg.className='msg err'; msg.textContent='Enter a roster number.'; return; }
+
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('edit-panel').classList.add('hidden');
+
   try{
     const res = await fetch(`/api/duty?roster=${encodeURIComponent(roster)}&day=${encodeURIComponent(day)}`);
     document.getElementById('loading').classList.add('hidden');
-    if(res.status === 404){ msg.className='msg err'; msg.textContent=`No duty found for ${roster} on ${day}.`; return; }
+    if(res.status === 404){
+      msg.className='msg err'; msg.textContent=`No duty found for ${roster} on ${day}.`;
+      return;
+    }
     if(!res.ok){ msg.className='msg err'; msg.textContent='Something went wrong. Try again.'; return; }
     const d = await res.json();
     currentDuty = d;
@@ -181,8 +178,10 @@ async function loadDuty(){
 function populateForm(d){
   document.getElementById('edit-title').textContent = d.roster;
   document.getElementById('edit-sub').textContent = `${d.zone} • ${d.day_type} • Duty ${d.duty_no||'—'}`;
-  const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc','finish','finish_loc','sign_off','spread','work','relief','route_no'];
+  const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc',
+                   'finish','finish_loc','sign_off','spread','work','relief','route_no'];
   fields.forEach(f => { document.getElementById('f-'+f).value = d[f] || ''; });
+
   const list = document.getElementById('stops-list');
   list.innerHTML = '';
   (d.stops || []).forEach(s => addStopRow(s[0], s[1]));
@@ -192,7 +191,11 @@ function addStopRow(name='', time=''){
   const list = document.getElementById('stops-list');
   const row = document.createElement('div');
   row.className = 'stops-row';
-  row.innerHTML = `<input placeholder="Stop name" value="${(name||'').replace(/"/g,'&quot;')}" class="stop-name"><input placeholder="HH:MM" value="${(time||'').replace(/"/g,'&quot;')}" class="stop-time" style="max-width:90px"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
+  row.innerHTML = `
+    <input placeholder="Stop name" value="${(name||'').replace(/"/g,'&quot;')}" class="stop-name">
+    <input placeholder="HH:MM" value="${(time||'').replace(/"/g,'&quot;')}" class="stop-time" style="max-width:90px">
+    <button type="button" onclick="this.parentElement.remove()">✕</button>
+  `;
   list.appendChild(row);
 }
 
@@ -206,9 +209,12 @@ async function saveDuty(ev){
   if(!currentDuty) return;
   const msg = document.getElementById('save-msg');
   msg.className='msg'; msg.textContent='';
-  const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc','finish','finish_loc','sign_off','spread','work','relief','route_no'];
+
+  const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc',
+                   'finish','finish_loc','sign_off','spread','work','relief','route_no'];
   const body = { id: currentDuty.id };
   fields.forEach(f => { body[f] = document.getElementById('f-'+f).value.trim(); });
+
   const stops = [];
   document.querySelectorAll('.stops-row').forEach(row=>{
     const name = row.querySelector('.stop-name').value.trim();
@@ -216,6 +222,7 @@ async function saveDuty(ev){
     if(name && time) stops.push([name, time]);
   });
   body.stops = stops;
+
   try{
     const res = await fetch('/api/duty', {
       method:'PUT',
@@ -229,7 +236,11 @@ async function saveDuty(ev){
       document.getElementById('login-panel').classList.remove('hidden');
       return;
     }
-    if(!res.ok){ const err = await res.json().catch(()=>({})); msg.className='msg err'; msg.textContent='Save failed: '+(err.error||res.status); return; }
+    if(!res.ok){
+      const err = await res.json().catch(()=>({}));
+      msg.className='msg err'; msg.textContent='Save failed: '+(err.error||res.status);
+      return;
+    }
     const updated = await res.json();
     currentDuty = updated;
     msg.className='msg ok'; msg.textContent='✓ Saved successfully.';
