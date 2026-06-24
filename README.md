@@ -1,7 +1,8 @@
-# Donnybrook Garage Duty Lookup — Full-Stack Version
+# Donnybrook Garage Duty Lookup — Full-Stack Version 2026
 
 A database-backed version of the duty lookup app. Replaces the single static
-HTML file (with all 997 duties baked in) with:
+HTML file (with all 997 duties baked
+in) with:
 
 - **`public/index.html`** — the same lookup app you already know, but it now
   fetches duty data live from the database instead of having it embedded.
