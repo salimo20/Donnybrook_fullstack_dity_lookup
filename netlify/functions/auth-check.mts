@@ -1,6 +1,6 @@
 Try AI directly in your favorite apps … Use Gemini to generate drafts and refine content, plus get Gemini Pro with access to Google's next-gen AI for €21.99 €5.49 for 3 months (personalized price)
 1
-100%
+125%
 import type { Context, Config } from "@netlify/functions";
 
 export default async (req: Request, _context: Context) => {
