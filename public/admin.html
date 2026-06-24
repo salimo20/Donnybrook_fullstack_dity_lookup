@@ -1,1 +1,246 @@
-placeholder 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duty Editor — Donnybrook Garage</title>
+<style>
+  :root{
+    --nav:#0d1f40; --nav2:#13294f; --yel:#F9BE00; --grn:#009A44; --blu:#00A5DF;
+    --red:#e53935; --mut:#8ba3c9; --fnt:#4a6285; --bg:#0a1730; --bg2:#13294f;
+    --brd:#26406e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#fff;min-height:100vh}
+  .hdr{background:var(--nav2);padding:18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--brd)}
+  .hdr h1{font-size:18px;margin:0;font-weight:800}
+  .badge{background:var(--yel);color:var(--nav);font-weight:800;border-radius:8px;padding:4px 10px;font-size:13px}
+  .wrap{max-width:600px;margin:0 auto;padding:16px}
+  .panel{background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid var(--brd)}
+  label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px;font-weight:700}
+  input,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--nav);color:#fff;font-size:15px;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--blu)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .btn{background:var(--yel);color:var(--nav);font-weight:800;border:0;border-radius:10px;padding:13px;font-size:15px;cursor:pointer;width:100%;margin-top:14px}
+  .btn:active{transform:scale(.98)}
+  .btn-sec{background:transparent;color:var(--mut);border:1px solid var(--brd)}
+  .msg{padding:10px 12px;border-radius:8px;font-size:14px;margin-top:10px;display:none}
+  .msg.ok{background:rgba(0,154,68,.15);color:#4ade80;display:block}
+  .msg.err{background:rgba(229,57,53,.15);color:#fca5a5;display:block}
+  .sec-t{font-size:12px;font-weight:800;color:var(--blu);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 6px;border-bottom:1px solid var(--brd);padding-bottom:6px}
+  .hint{font-size:12px;color:var(--mut);margin-top:4px}
+  .stops-row{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+  .stops-row input{flex:1}
+  .stops-row button{background:rgba(229,57,53,.15);color:#fca5a5;border:1px solid rgba(229,57,53,.3);border-radius:6px;width:34px;height:38px;cursor:pointer;font-size:16px}
+  .add-stop{background:rgba(0,165,223,.12);color:var(--blu);border:1px solid rgba(0,165,223,.3);border-radius:8px;padding:8px;width:100%;cursor:pointer;font-size:13px;font-weight:700;margin-top:4px}
+  .hidden{display:none}
+  .spinner{text-align:center;color:var(--mut);padding:20px}
+</style>
+</head>
+<body>
+<div class="hdr"><span class="badge">DB</span><h1>Duty Editor</h1></div>
+<div class="wrap">
+
+  <div id="login-panel" class="panel">
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px">🔒 Admin sign-in</div>
+    <div class="hint">Enter the editor password to make changes.</div>
+    <label>Password</label>
+    <input id="login-pw" type="password" autocomplete="current-password">
+    <button class="btn" onclick="doLogin()">Unlock Editor</button>
+    <div id="login-msg" class="msg"></div>
+  </div>
+
+  <div id="app-content" class="hidden">
+
+  <div class="panel">
+    <label>Roster Number</label>
+    <input id="q-roster" placeholder="e.g. DZ5/9X" autocomplete="off" autocapitalize="characters">
+    <label>Day</label>
+    <select id="q-day">
+      <option value="Mon-Fri">Weekdays</option>
+      <option value="Saturday">Saturday</option>
+      <option value="Sunday">Sunday</option>
+    </select>
+    <button class="btn" onclick="loadDuty()">🔍 Find Duty</button>
+    <div id="search-msg" class="msg"></div>
+  </div>
+
+  <div id="loading" class="spinner hidden">Loading…</div>
+
+  <form id="edit-panel" class="panel hidden" onsubmit="saveDuty(event)">
+    <div id="edit-title" style="font-size:20px;font-weight:800;color:var(--yel)"></div>
+    <div class="hint" id="edit-sub"></div>
+
+    <div class="sec-t">Sign On / Off</div>
+    <div class="row">
+      <div><label>Report</label><input id="f-report"></div>
+      <div><label>Depart</label><input id="f-depart"></div>
+    </div>
+    <label>Start Location</label><input id="f-start_loc">
+
+    <div class="sec-t">Break (leave blank if straight duty)</div>
+    <div class="row">
+      <div><label>Break Start</label><input id="f-break_start"></div>
+      <div><label>Break Location</label><input id="f-break_loc"></div>
+    </div>
+    <div class="row">
+      <div><label>Resume Time</label><input id="f-period2_start"></div>
+      <div><label>Resume Location</label><input id="f-period2_loc"></div>
+    </div>
+
+    <div class="sec-t">Finish</div>
+    <div class="row">
+      <div><label>Finish Time</label><input id="f-finish"></div>
+      <div><label>Finish Location</label><input id="f-finish_loc"></div>
+    </div>
+    <label>Sign Off</label><input id="f-sign_off">
+
+    <div class="sec-t">Hours</div>
+    <div class="row3">
+      <div><label>Spread</label><input id="f-spread"></div>
+      <div><label>Work</label><input id="f-work"></div>
+      <div><label>Relief</label><input id="f-relief"></div>
+    </div>
+    <label>Route No.</label><input id="f-route_no">
+
+    <div class="sec-t">Timing Points (stop, time)</div>
+    <div id="stops-list"></div>
+    <button type="button" class="add-stop" onclick="addStopRow()">+ Add stop</button>
+
+    <button class="btn" type="submit">💾 Save Changes</button>
+    <button class="btn btn-sec" type="button" onclick="cancelEdit()">Cancel</button>
+    <div id="save-msg" class="msg"></div>
+  </form>
+
+  </div>
+</div>
+
+<script>
+let currentDuty = null;
+let adminPassword = null;
+
+async function doLogin(){
+  const pw = document.getElementById('login-pw').value;
+  const msg = document.getElementById('login-msg');
+  msg.className = 'msg'; msg.textContent = '';
+  if (!pw) { msg.className = 'msg err'; msg.textContent = 'Enter a password.'; return; }
+  try {
+    const res = await fetch('/api/auth-check', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ password: pw }),
+    });
+    const data = await res.json();
+    if (!data.ok) { msg.className = 'msg err'; msg.textContent = 'Incorrect password.'; return; }
+    adminPassword = pw;
+    sessionStorage.setItem('admin_pw', pw);
+    document.getElementById('login-panel').classList.add('hidden');
+    document.getElementById('app-content').classList.remove('hidden');
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = 'Network error: ' + e.message;
+  }
+}
+
+(function restoreSession(){
+  const saved = sessionStorage.getItem('admin_pw');
+  if (saved) {
+    adminPassword = saved;
+    document.getElementById('login-panel').classList.add('hidden');
+    document.getElementById('app-content').classList.remove('hidden');
+  }
+})();
+
+document.getElementById('login-pw').addEventListener('keypress', e=>{
+  if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
+});
+
+async function loadDuty(){
+  const roster = document.getElementById('q-roster').value.trim();
+  const day = document.getElementById('q-day').value;
+  const msg = document.getElementById('search-msg');
+  msg.className = 'msg'; msg.textContent='';
+  if(!roster){ msg.className='msg err'; msg.textContent='Enter a roster number.'; return; }
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('edit-panel').classList.add('hidden');
+  try{
+    const res = await fetch(`/api/duty?roster=${encodeURIComponent(roster)}&day=${encodeURIComponent(day)}`);
+    document.getElementById('loading').classList.add('hidden');
+    if(res.status === 404){ msg.className='msg err'; msg.textContent=`No duty found for ${roster} on ${day}.`; return; }
+    if(!res.ok){ msg.className='msg err'; msg.textContent='Something went wrong. Try again.'; return; }
+    const d = await res.json();
+    currentDuty = d;
+    populateForm(d);
+    document.getElementById('edit-panel').classList.remove('hidden');
+  }catch(e){
+    document.getElementById('loading').classList.add('hidden');
+    msg.className='msg err'; msg.textContent='Network error: '+e.message;
+  }
+}
+
+function populateForm(d){
+  document.getElementById('edit-title').textContent = d.roster;
+  document.getElementById('edit-sub').textContent = `${d.zone} • ${d.day_type} • Duty ${d.duty_no||'—'}`;
+  const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc','finish','finish_loc','sign_off','spread','work','relief','route_no'];
+  fields.forEach(f => { document.getElementById('f-'+f).value = d[f] || ''; });
+  const list = document.getElementById('stops-list');
+  list.innerHTML = '';
+  (d.stops || []).forEach(s => addStopRow(s[0], s[1]));
+}
+
+function addStopRow(name='', time=''){
+  const list = document.getElementById('stops-list');
+  const row = document.createElement('div');
+  row.className = 'stops-row';
+  row.innerHTML = `<input placeholder="Stop name" value="${(name||'').replace(/"/g,'&quot;')}" class="stop-name"><input placeholder="HH:MM" value="${(time||'').replace(/"/g,'&quot;')}" class="stop-time" style="max-width:90px"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(row);
+}
+
+function cancelEdit(){
+  document.getElementById('edit-panel').classList.add('hidden');
+  currentDuty = null;
+}
+
+async function saveDuty(ev){
+  ev.preventDefault();
+  if(!currentDuty) return;
+  const msg = document.getElementById('save-msg');
+  msg.className='msg'; msg.textContent='';
+  const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc','finish','finish_loc','sign_off','spread','work','relief','route_no'];
+  const body = { id: currentDuty.id };
+  fields.forEach(f => { body[f] = document.getElementById('f-'+f).value.trim(); });
+  const stops = [];
+  document.querySelectorAll('.stops-row').forEach(row=>{
+    const name = row.querySelector('.stop-name').value.trim();
+    const time = row.querySelector('.stop-time').value.trim();
+    if(name && time) stops.push([name, time]);
+  });
+  body.stops = stops;
+  try{
+    const res = await fetch('/api/duty', {
+      method:'PUT',
+      headers:{'content-type':'application/json', 'x-admin-password': adminPassword || ''},
+      body: JSON.stringify(body)
+    });
+    if(res.status === 401){
+      sessionStorage.removeItem('admin_pw');
+      msg.className='msg err'; msg.textContent='Session expired — please sign in again.';
+      document.getElementById('app-content').classList.add('hidden');
+      document.getElementById('login-panel').classList.remove('hidden');
+      return;
+    }
+    if(!res.ok){ const err = await res.json().catch(()=>({})); msg.className='msg err'; msg.textContent='Save failed: '+(err.error||res.status); return; }
+    const updated = await res.json();
+    currentDuty = updated;
+    msg.className='msg ok'; msg.textContent='✓ Saved successfully.';
+  }catch(e){
+    msg.className='msg err'; msg.textContent='Network error: '+e.message;
+  }
+}
+
+document.getElementById('q-roster').addEventListener('keypress', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); loadDuty(); }
+});
+</script>
+</body>
+</html>
