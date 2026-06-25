@@ -102,7 +102,10 @@
       <div><label>Work</label><input id="f-work"></div>
       <div><label>Relief</label><input id="f-relief"></div>
     </div>
-    <label>Route No.</label><input id="f-route_no">
+    <div class="row">
+      <div><label>Route No.</label><input id="f-route_no" placeholder="e.g. E1"></div>
+      <div><label>Ticket Machine No.</label><input id="f-b_rota" placeholder="e.g. 036"></div>
+    </div>
 
     <div class="sec-t">Timing Points (stop, time)</div>
     <div id="stops-list"></div>
@@ -125,25 +128,11 @@ async function doLogin(){
   const msg = document.getElementById('login-msg');
   msg.className = 'msg'; msg.textContent = '';
   if (!pw) { msg.className = 'msg err'; msg.textContent = 'Enter a password.'; return; }
-
-  try {
-    const res = await fetch('/api/auth-check', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ password: pw }),
-    });
-    const data = await res.json();
-    if (!data.ok) {
-      msg.className = 'msg err'; msg.textContent = 'Incorrect password.';
-      return;
-    }
-    adminPassword = pw;
-    sessionStorage.setItem('admin_pw', pw);
-    document.getElementById('login-panel').classList.add('hidden');
-    document.getElementById('app-content').classList.remove('hidden');
-  } catch (e) {
-    msg.className = 'msg err'; msg.textContent = 'Network error: ' + e.message;
-  }
+  // Password is verified server-side on every save (PUT returns 401 if wrong).
+  adminPassword = pw;
+  sessionStorage.setItem('admin_pw', pw);
+  document.getElementById('login-panel').classList.add('hidden');
+  document.getElementById('app-content').classList.remove('hidden');
 }
 
 // Restore session within this browser tab so a refresh doesn't force re-login
@@ -193,7 +182,7 @@ function populateForm(d){
   document.getElementById('edit-title').textContent = d.roster;
   document.getElementById('edit-sub').textContent = `${d.zone} • ${d.day_type} • Duty ${d.duty_no||'—'}`;
   const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc',
-                   'finish','finish_loc','sign_off','spread','work','relief','route_no'];
+                   'finish','finish_loc','sign_off','spread','work','relief','route_no','b_rota'];
   fields.forEach(f => { document.getElementById('f-'+f).value = d[f] || ''; });
 
   const list = document.getElementById('stops-list');
@@ -225,7 +214,7 @@ async function saveDuty(ev){
   msg.className='msg'; msg.textContent='';
 
   const fields = ['report','depart','start_loc','break_start','break_loc','period2_start','period2_loc',
-                   'finish','finish_loc','sign_off','spread','work','relief','route_no'];
+                   'finish','finish_loc','sign_off','spread','work','relief','route_no','b_rota'];
   const body = { id: currentDuty.id };
   fields.forEach(f => { body[f] = document.getElementById('f-'+f).value.trim(); });
 
